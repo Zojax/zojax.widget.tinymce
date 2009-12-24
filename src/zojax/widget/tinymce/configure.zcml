@@ -1,0 +1,56 @@
+<configure
+   xmlns="http://namespaces.zope.org/zope"
+   xmlns:z3c="http://namespaces.zope.org/z3c"
+   xmlns:zojax="http://namespaces.zope.org/zojax"
+   xmlns:browser="http://namespaces.zope.org/browser"
+   i18n_domain="zojax.widget.tinymce">
+
+  <utility
+     name="tinymce"
+     factory=".widget.TinyMCEWidgetFactory" />
+
+  <z3c:widgetTemplate
+     mode="display"
+     widget=".widget.TinyMCETextWidget"
+     layer="z3c.form.interfaces.IFormLayer"
+     template="widget_display.pt" />
+
+  <z3c:widgetTemplate
+     mode="input"
+     widget=".widget.TinyMCETextWidget"
+     layer="z3c.form.interfaces.IFormLayer"
+     template="widget_input.pt" />
+
+  <browser:page
+     name="tinymce_image_list.js"
+     for="zojax.content.attachment.interfaces.IAttachmentsAware"
+     class=".attachments.ImageList"
+     permission="zope.View" />
+
+  <browser:page
+     name="tinymce_link_list.js"
+     for="zojax.content.attachment.interfaces.IAttachmentsAware"
+     class=".attachments.LinkList"
+     permission="zope.View" />
+
+  <browser:page
+     name="tinymce_file_list.js"
+     for="zojax.content.attachment.interfaces.IAttachmentsAware"
+     class=".attachments.FileList"
+     permission="zope.View" />
+
+  <zojax:resourcedirectory
+     name="tiny-mce"
+     directory="resources" />
+
+  <zojax:resourcepackage
+     type="javascript"
+     name="tiny-mce/tiny_mce.js"
+     title="Tiny MCE (JS)"
+     cache="dynamic"
+     library="tiny-mce">
+    <resource path="tiny-mce/tiny_mce_src.js" />
+    <resource path="tiny-mce/tiny_mce_popups.js" />
+  </zojax:resourcepackage>
+
+</configure>

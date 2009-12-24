@@ -1,0 +1,15 @@
+1. Allow system configuration to configure plugins and layout
+
+2. Handle restructured text - Switch to Basic HTML Textarea Widget
+
+3. Why don't styles work?
+   Also pick up the style sheet based on the site. 
+
+4. Predefined templates
+
+5. Multiple configurations, i.e. the editor for page editing is more
+   complex than the editor for news items
+   
+6. Upload images / attachments
+
+7. Portable / localised dates

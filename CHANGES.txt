@@ -1,18 +1,8 @@
-=======
-CHANGES
-=======
-
-0.2.1 (Unreleased)
+1.0.2 (Unreleased)
 ------------------
 
 
-0.2.0 (2009-10-05)
+1.0.1 (2010-01-19)
 ------------------
 
-- Do not use z3c.autoinclude
-
-
-0.1.0 (2009-03-15)
-------------------
-
-- Initial release
+- zojax initial release

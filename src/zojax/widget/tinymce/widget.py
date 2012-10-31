@@ -114,7 +114,7 @@ class TinyMCETextWidget(TextAreaWidget):
         if self.request.locale.id.language in MCE_LANGS:
             mceOptions += ('language : "%s", ' % \
                            self.request.locale.id.language)
-        return template % {"name": self.name, "options": mceOptions}
+        return template % {"name": self.id, "options": mceOptions}
 
     def render(self):
         if self.mode == interfaces.DISPLAY_MODE:

@@ -53,7 +53,7 @@
      cache="dynamic"
      library="tiny-mce">
     <resource path="tiny-mce/tiny_mce_src.js" />
-    <resource path="tiny-mce/tiny_mce_popups.js" />
+    <resource path="tiny-mce/tiny_mce_popup.js" />
   </zojax:resourcepackage>
 
 </configure>

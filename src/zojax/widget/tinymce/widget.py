@@ -3,6 +3,11 @@
 
 """
 __docformat__ = "reStructuredText"
+from zope.component import getUtility
+from zope.app.intid.interfaces import IIntIds
+from zojax.personal.space.interfaces import IPersonalSpace
+from zope.security import checkPermission
+
 import zope.component
 import zope.interface
 import zope.schema.interfaces
@@ -58,12 +63,13 @@ class TinyMCETextWidget(TextAreaWidget):
     mce_theme_advanced_resizing = True
     mce_button_tile_map = True
 
-    mce_plugins = "safari,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template"
+    # mce_plugins = "safari,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template"
+    mce_plugins = "safari,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,zojaxm,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template"
     # Theme options
     mce_theme_advanced_buttons1 = "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect"
     mce_theme_advanced_buttons2 = "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor"
-    mce_theme_advanced_buttons3 = "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen"
-    mce_theme_advanced_buttons4 = "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertfile,insertimage"
+    mce_theme_advanced_buttons3 = "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen,zojaxm"
+    mce_theme_advanced_buttons4 = "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak"
 
     mce_plugin_insertdate_dateFormat = "%d/%m/%Y"
     mce_plugin_insertdate_timeFormat = "%H:%M:%S"
@@ -71,6 +77,14 @@ class TinyMCETextWidget(TextAreaWidget):
 
     mce_paste_auto_cleanup_on_paste = True
     mce_paste_convert_headers_to_strong = True
+
+    # @property
+    # def mce_content_id(self):
+    #     site = getSite()
+    #     ids = getUtility(IIntIds)
+    #     context = self.context
+    #     contextId = ids.queryId(removeAllProxies(context))
+    #     return contextId
 
     # TODO: This is not working (and a portable path)
     @property
@@ -117,6 +131,30 @@ class TinyMCETextWidget(TextAreaWidget):
         return template % {"name": self.id, "options": mceOptions}
 
     def render(self):
+
+        self.mce_url1 = self.mce_url2 = self.mce_mediaUrl1 = self.mce_mediaUrl2 = self.mce_contentUrl = ''
+        site = getSite()
+        ids = getUtility(IIntIds)
+        siteUrl = absoluteURL(site, self.request)
+        context = self.context
+        contextId = ids.queryId(removeAllProxies(context))
+        siteId = ids.queryId(removeAllProxies(site))
+
+        if contextId:
+            self.mce_url1 = '%s/@@content.attachments/%s/imageManagerAPI/'%(siteUrl, contextId)
+            self.mce_mediaUrl1 = '%s/@@content.attachments/%s/mediaManagerAPI/'%(siteUrl, contextId)
+
+        space = IPersonalSpace(self.request.principal, None)
+        if space is not None and checkPermission('zojax.AddContentAttachment', space):
+            spaceId = ids.getId(space)
+            self.mce_url2 = '%s/@@content.attachments/%s/imageManagerAPI/'%(siteUrl, spaceId)
+            self.mce_mediaUrl2 = '%s/@@content.attachments/%s/mediaManagerAPI/'%(siteUrl, spaceId)
+
+        if contextId:
+            self.mce_contentUrl = '%s/@@content.browser/%s/contentManagerAPI/'%(siteUrl, contextId)
+        else:
+            self.mce_contentUrl = '%s/@@content.browser/%s/contentManagerAPI/'%(siteUrl, siteId)
+
         if self.mode == interfaces.DISPLAY_MODE:
             if IRichTextData.providedBy(self.value):
                 self.value = removeAllProxies(self.value).cooked

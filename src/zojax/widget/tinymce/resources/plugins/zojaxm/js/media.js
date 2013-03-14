@@ -94,11 +94,8 @@ var ZojaxDialog = {
 		tinyMCEPopup.resizeToInnerSize();
         editor = tinyMCE.activeEditor;
         $ = editor.getWin().parent.jQuery;
-
         $(tinyMCEPopup.dom.get('z_error'))
-
         this.activateImages();
-
         this.loadData();
     },
 
@@ -113,15 +110,15 @@ var ZojaxDialog = {
 
     success : function (d) {
         $(tinyMCEPopup.dom.get('z_wait')).hide();
-//        d = d.replace('<pre>', '');
-//        d = d.replace('</pre>', '');
-//        data = $.parseJSON(d);
-//        if(!data.success) {
+        d = $(d).text().replace('<pre>', '');
+        d = d.replace('</pre>', '');
+        data = $.parseJSON(d);
+        if(!data.success) {
             $(tinyMCEPopup.dom.get('z_error')).html(data.error);
             setTimeout(ZojaxDialog.hideError, 3000);
-//        } else {
+        } else {
             ZojaxDialog.loadData();
-//        }
+        }
     },
 
     upload: function(form) {

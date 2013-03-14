@@ -69,7 +69,7 @@ var ZojaxDialog = {
                 $(k).append(
                         $('<div class="z_imz_o">' +
                             '<span title="Delete Image" class="z_delete" id="zojaxd'+i+'">x</span>' +
-                            '<div><img style="margin-top:'+(40-ZojaxDialog.images[i].thumbheight/2)+'px;" id="zojaxm'+i+'" src="'+ZojaxDialog.images[i].preview+'"' +
+                            '<div style=""><img style="margin-top:'+(40-ZojaxDialog.images[i].thumbheight/2)+'px;" id="zojaxm'+i+'" src="'+ZojaxDialog.images[i].preview+'"' +
                             'title="'+m.tip+'Kb" /></div>' +
                             '<div class="z_title">'+ZojaxDialog.images[i].label+'</div>'+
                            '</div>'
@@ -100,27 +100,28 @@ var ZojaxDialog = {
 
     success : function (d) {
         $(tinyMCEPopup.dom.get('z_wait')).hide();
-        d = d.replace('<pre>', '');
-        d = d.replace('</pre>', '');
-        data = JSON && JSON.parse(d) || $.parseJSON(d);
-        if(!data.success) {
+//        d = d.replace('<pre>', '');
+//        d = d.replace('</pre>', '');
+//        data = $.parseJSON(d);
+//        if(!data.success) {
             $(tinyMCEPopup.dom.get('z_error')).html(data.error);
             setTimeout(ZojaxDialog.hideError, 3000);
-        } else {
+//        } else {
             ZojaxDialog.loadData();
-        }
+//        }
     },
 
     upload: function(form) {
         $(tinyMCEPopup.dom.get('z_wait')).show();
         fileUpload(form, ZojaxDialog.success);
-        ZojaxDialog.loadData();
     },
 
     remove: function(image) {
        if(confirm("Delete image "+image.title)) {
+            $(tinyMCEPopup.dom.get('z_wait')).show();
             $.post(tinyMCE.activeEditor.getParam('url2')+'remove', {image: image.title}, function(data) {
                 ZojaxDialog.loadData();
+                $(tinyMCEPopup.dom.get('z_wait')).hide();
             });
        }
     },

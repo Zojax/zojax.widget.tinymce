@@ -7,7 +7,7 @@
                 ed.windowManager.open({
                     file : url + '/media.htm',
                     width : 590,
-                    height : 400,
+                    height : 420,
                     inline : 1
                 }, {
                     plugin_url : url

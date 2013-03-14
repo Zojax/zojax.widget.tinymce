@@ -50,10 +50,13 @@ var ZojaxDialog = {
         var params =  {ph:80, pw:80, sort:order};
         if(order=="title") params.dir = "asc";
 
+        $(tinyMCEPopup.dom.get('z_wait')).show();
+
         $.post(tinyMCE.activeEditor.getParam('url2')+'listing', params, function(data) {
             ZojaxDialog.images = data.images;
             ZojaxDialog.formatData(ZojaxDialog.images);
             ZojaxDialog.redrawData()
+            $(tinyMCEPopup.dom.get('z_wait')).hide();
         });
     },
 
@@ -91,7 +94,17 @@ var ZojaxDialog = {
 		tinyMCEPopup.resizeToInnerSize();
         editor = tinyMCE.activeEditor;
         $ = editor.getWin().parent.jQuery;
+
+        $(tinyMCEPopup.dom.get('z_error'))
+
+        this.activateImages();
+
         this.loadData();
+    },
+
+    activateImages: function() {
+        $(tinyMCEPopup.dom.get('z_nav')).find('.z_tab').removeClass('selected');
+        $(tinyMCEPopup.dom.get('z_images')).addClass('selected');
     },
 
     order: function(sel) {

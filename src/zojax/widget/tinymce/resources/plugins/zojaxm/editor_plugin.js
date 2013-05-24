@@ -6,8 +6,8 @@
             ed.addCommand('mceZojaxm', function() {
                 ed.windowManager.open({
                     file : url + '/media.htm',
-                    width : 590,
-                    height : 420,
+                    width : 600,
+                    height : 430,
                     inline : 1
                 }, {
                     plugin_url : url

@@ -8,6 +8,7 @@ var ZojaxDialog = {
 
     $: {},
     images: [],
+    selected_image: {},
     self: this,
 
     hideError: function() {
@@ -62,25 +63,29 @@ var ZojaxDialog = {
 
     redrawData: function(filter) {
 
-        k = tinyMCEPopup.dom.get('images_content');
+        var k = tinyMCEPopup.dom.get('images_content');
         $(k).html('');
-        for(i in ZojaxDialog.images) {
+        for(var i in ZojaxDialog.images) {
 
-            m = ZojaxDialog.images[i];
+            var m = ZojaxDialog.images[i];
 
             if(!filter || filter.trim()=='' || m.title.toUpperCase().indexOf(filter.toUpperCase()) != -1 ) {
                 $(k).append(
-                        $('<div class="z_imz_o">' +
+                        $('<div class="z_imz_o" id="zojax-image-'+i+'">' +
                             '<span title="Delete Image" class="z_delete" id="zojaxd'+i+'">x</span>' +
                             '<div style=""><img style="margin-top:'+(40-ZojaxDialog.images[i].thumbheight/2)+'px;" id="zojaxm'+i+'" src="'+ZojaxDialog.images[i].preview+'"' +
                             'title="'+m.tip+'Kb" /></div>' +
-                            '<div class="z_title">'+ZojaxDialog.images[i].label+'</div>'+
+                                '<div class="z_title">'+ZojaxDialog.images[i].label+'</div>'+
                            '</div>'
                         ));
 
+
                 document.getElementById('zojaxm'+i).onclick = (function(i){
-                        return function(){ ZojaxDialog.insert(ZojaxDialog.images[i]); }
+                        return function(){ ZojaxDialog.activateImg(i); }
                     })(i);
+//                document.getElementById('zojaxm'+i).onclick = (function(i){
+//                        return function(){ ZojaxDialog.activateImg(ZojaxDialog.images[i]); }
+//                    })(i);
                 document.getElementById('zojaxd'+i).onclick = (function(i){
                         return function(){ ZojaxDialog.remove(ZojaxDialog.images[i]); }
                     })(i);
@@ -95,13 +100,27 @@ var ZojaxDialog = {
         editor = tinyMCE.activeEditor;
         $ = editor.getWin().parent.jQuery;
         $(tinyMCEPopup.dom.get('z_error'))
-        this.activateImages();
+        console.log(tinyMCEPopup.dom)
+        console.log(tinyMCEPopup.dom.get('z_nav').children)
+
+        $(tinyMCEPopup.dom.get('z_nav').children).click(this.switchTab);
+        $(tinyMCEPopup.dom.get('insert-button')).click(this.insert);
+
+//        this.activateImages();
         this.loadData();
     },
 
     activateImages: function() {
         $(tinyMCEPopup.dom.get('z_nav')).find('.z_tab').removeClass('selected');
         $(tinyMCEPopup.dom.get('z_images')).addClass('selected');
+    },
+
+    switchTab: function(){
+        console.log('Click on tab', this, self, $(this).attr('data-tab-id'));
+        $(tinyMCEPopup.dom.get('z_nav').children).removeClass('selected');
+        $(this).addClass('selected');
+        $(tinyMCEPopup.dom.get('z_tab_container').children).removeClass('active');
+        $(tinyMCEPopup.dom.get($(this).attr('data-tab-id'))).addClass('active');
     },
 
     order: function(sel) {
@@ -136,13 +155,40 @@ var ZojaxDialog = {
        }
     },
 
-	insert : function(image) {
+	insert : function (slef) {
 		var ed = tinyMCEPopup.editor, dom = ed.dom;
-		tinyMCEPopup.execCommand('mceInsertContent', false, dom.createHTML('img', {
-			src : tinyMCEPopup.getWindowArg('plugin_url') + '/img/' + image.url
-		}));
-	tinyMCEPopup.close();
-	}
+        var image = ZojaxDialog.selected_image
+        var width = tinyMCEPopup.dom.get('image-info-dimansions-w').value;
+        var height = tinyMCEPopup.dom.get('image-info-dimansions-h').value;
+        var img_source = '<span><a href="' + image.url +
+            '" title="' + image.url +
+            '" target="_blank"' +
+            ' rel="prettyPhoto[pp_gal]">' +
+            '<img alt=" ' + image.label + '"' +
+            ' src="' + image.url + '/preview/' + width + 'x' + height + '">' +
+            '</a></span>​'
+
+		tinyMCEPopup.execCommand('mceInsertContent', false, img_source);
+	    tinyMCEPopup.close();
+    },
+
+
+    activateImg: function(image) {
+        $(tinyMCEPopup.dom.get('images_content').children).removeClass('active');
+        $(tinyMCEPopup.dom.get('zojax-image-'+image)).addClass('active');
+        console.log('Click on img', ZojaxDialog.images[image]);
+        ZojaxDialog.selected_image = ZojaxDialog.images[image];
+        ZojaxDialog.setImageInfo(ZojaxDialog.images[image]);
+    },
+
+    setImageInfo: function(image) {
+        tinyMCEPopup.dom.get('image-info-source').value = image.url;
+        tinyMCEPopup.dom.get('image-info-description').value = image.label;
+        tinyMCEPopup.dom.get('image-info-dimansions-w').value = image.width;
+        tinyMCEPopup.dom.get('image-info-dimansions-h').value = image.height;
+    }
+
+
 };
 
 tinyMCEPopup.onInit.add(ZojaxDialog.init, ZojaxDialog);

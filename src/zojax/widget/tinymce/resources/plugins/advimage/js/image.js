@@ -1,4 +1,6 @@
 var ImageDialog = {
+    $: {},
+
 	preInit : function() {
 		var url;
 
@@ -17,6 +19,7 @@ var ImageDialog = {
 		this.fillFileList('over_list', fl);
 		this.fillFileList('out_list', fl);
 		TinyMCE_EditableSelects.init();
+        $ = tinyMCE.activeEditor.getWin().parent.jQuery;
 
 		if (n.nodeName == 'IMG') {
 			nl.src.value = dom.getAttrib(n, 'src');
@@ -86,7 +89,90 @@ var ImageDialog = {
 
 		this.changeAppearance();
 		this.showPreviewImage(nl.src.value, 1);
+        this.loadData();
 	},
+
+
+    formatData : function(data_all) {
+        for(var d in data_all) {
+
+            if (isNaN(parseInt(d))) continue;
+            var data = data_all[d];
+            data.label = (data.title.length > 15)
+                ? data.name.substr(0, 12) + '...' : data.title;
+            data.tip = "Name: " + data.title +
+                ", Dimensions: " + data.width + " x " + data.height +
+                ", Size: " + ((data.size < 1024) ? data.size + " bytes"
+                : (Math.round(((data.size * 10) / 1024)) / 10) + " KB");
+            if (data.width > data.height) {
+                if (data.width < 80) {
+                    data.thumbwidth = data.width;
+                    data.thumbheight = data.height;
+                } else {
+                    data.thumbwidth = 80;
+                    data.thumbheight = 80 / data.width * data.height;
+                }
+            } else {
+                if (data.height < 80) {
+                    data.thumbwidth = data.width;
+                    data.thumbheight = data.height;
+                } else {
+                    data.thumbwidth = 80 / data.height * data.width;
+                    data.thumbheight = 80;
+                }
+            }
+        }
+    },
+
+
+    redrawData: function(filter) {
+
+        var k = tinyMCEPopup.dom.get('images_content');
+        $(k).html('');
+        for(var i in ImageDialog.images) {
+
+            var m = ImageDialog.images[i];
+
+            if(!filter || filter.trim()=='' || m.title.toUpperCase().indexOf(filter.toUpperCase()) != -1 ) {
+                $(k).append(
+                        $('<div class="z_imz_o" id="zojax-image-'+i+'">' +
+                            '<span title="Delete Image" class="z_delete" id="zojaxd'+i+'">x</span>' +
+                            '<div style=""><img style="margin-top:'+(40-ImageDialog.images[i].thumbheight/2)+'px;" id="zojaxm'+i+'" src="'+ImageDialog.images[i].preview+'"' +
+                            'title="'+m.tip+'Kb" /></div>' +
+                                '<div class="z_title">'+ImageDialog.images[i].label+'</div>'+
+                           '</div>'
+                        ));
+
+
+                document.getElementById('zojax-image-'+i).onclick = (function(i){
+                        return function(){ ImageDialog.activateImg(i); }
+                    })(i);
+//                document.getElementById('zojaxm'+i).onclick = (function(i){
+//                        return function(){ ImageDialog.activateImg(ImageDialog.images[i]); }
+//                    })(i);
+                document.getElementById('zojaxd'+i).onclick = (function(i){
+                        return function(){ ImageDialog.remove(ImageDialog.images[i]); }
+                    })(i);
+            }
+        }
+    },
+
+    loadData: function(order) {
+        if(!order) order = "modified";
+        var params =  {ph:80, pw:80, sort:order};
+        if(order=="title") params.dir = "asc";
+
+        $(tinyMCEPopup.dom.get('z_wait')).show();
+
+        $.post(tinyMCE.activeEditor.getParam('url2')+'listing', params, function(data) {
+            ImageDialog.images = data.images;
+            ImageDialog.formatData(ImageDialog.images);
+            ImageDialog.redrawData()
+            $(tinyMCEPopup.dom.get('z_wait')).hide();
+        });
+    },
+
+
 
 	insert : function(file, title) {
 		var ed = tinyMCEPopup.editor, t = this, f = document.forms[0];
@@ -457,8 +543,106 @@ var ImageDialog = {
 			tinyMCEPopup.dom.setHTML('prev', '<img id="previewImg" src="' + u + '" border="0" onload="ImageDialog.updateImageData(this);" onerror="ImageDialog.resetImageData();" />');
 		else
 			tinyMCEPopup.dom.setHTML('prev', '<img id="previewImg" src="' + u + '" border="0" onload="ImageDialog.updateImageData(this, 1);" />');
-	}
+    },
+
+
+    success : function (d) {
+        $(tinyMCEPopup.dom.get('z_wait')).hide();
+        d = $(d).text().replace('<pre>', '');
+        d = d.replace('</pre>', '');
+        data = $.parseJSON(d);
+        if(!data.success) {
+            $(tinyMCEPopup.dom.get('z_error')).html(data.error);
+            setTimeout(ImageDialog.hideError, 3000);
+        } else {
+            ImageDialog.loadData();
+        }
+    },
+
+    upload: function(form) {
+        $(tinyMCEPopup.dom.get('z_wait')).show();
+        fileUpload(form, ImageDialog.success);
+    },
+
+    order: function(sel) {
+        this.loadData($(sel).val());
+    },
+
+    remove: function(image) {
+       if(confirm("Delete image "+image.title)) {
+            $(tinyMCEPopup.dom.get('z_wait')).show();
+            $.post(tinyMCE.activeEditor.getParam('url2')+'remove', {image: image.title}, function(data) {
+                ImageDialog.loadData();
+                $(tinyMCEPopup.dom.get('z_wait')).hide();
+            });
+       }
+    },
+
+
+    activateImg: function(image) {
+        $(tinyMCEPopup.dom.get('images_content').children).removeClass('active');
+        $(tinyMCEPopup.dom.get('zojax-image-'+image)).addClass('active');
+        ImageDialog.setImageInfo(ImageDialog.images[image]);
+    },
+
+    setImageInfo: function(image) {
+        var ed = tinyMCEPopup.editor, f = document.forms[0], nl = f.elements, v, args = {}, el;
+        nl.src.value = image.url;
+        nl.alt.value = image.name;
+        nl.title.value = image.label;
+        ImageDialog.showPreviewImage(nl.src.value);
+    }
+
+
 };
 
 ImageDialog.preInit();
 tinyMCEPopup.onInit.add(ImageDialog.init, ImageDialog);
+
+function fileUpload(form, success) {
+
+    var action_url = tinyMCE.activeEditor.getParam('url2')+'upload';
+
+    var iframe = document.createElement("iframe");
+    iframe.setAttribute("id", "upload_iframe");
+    iframe.setAttribute("name", "upload_iframe");
+    iframe.setAttribute("width", "0");
+    iframe.setAttribute("height", "0");
+    iframe.setAttribute("border", "0");
+    iframe.setAttribute("style", "width: 0; height: 0; border: none;");
+
+    // Add to document...
+    form.parentNode.appendChild(iframe);
+    window.frames['upload_iframe'].name = "upload_iframe";
+
+    iframeId = document.getElementById("upload_iframe");
+
+    var eventHandler = function () {
+
+        if (iframeId.detachEvent) iframeId.detachEvent("onload", eventHandler);
+        else iframeId.removeEventListener("load", eventHandler, false);
+
+        if (iframeId.contentDocument) {
+            content = iframeId.contentDocument.body.innerHTML;
+        } else if (iframeId.contentWindow) {
+            content = iframeId.contentWindow.document.body.innerHTML;
+        } else if (iframeId.document) {
+            content = iframeId.document.body.innerHTML;
+        }
+
+        success(content);
+
+        setTimeout('iframeId.parentNode.removeChild(iframeId)', 250);
+    }
+
+    if (iframeId.addEventListener) iframeId.addEventListener("load", eventHandler, true);
+    if (iframeId.attachEvent) iframeId.attachEvent("onload", eventHandler);
+
+    form.setAttribute("target", "upload_iframe");
+    form.setAttribute("action", action_url);
+    form.setAttribute("method", "post");
+    form.setAttribute("enctype", "multipart/form-data");
+    form.setAttribute("encoding", "multipart/form-data");
+
+    form.submit();
+}

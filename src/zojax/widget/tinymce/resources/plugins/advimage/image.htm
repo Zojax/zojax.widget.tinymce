@@ -9,20 +9,150 @@
 	<script type="text/javascript" src="../../utils/editable_selects.js"></script>
 	<script type="text/javascript" src="js/image.js"></script>
 	<link href="css/advimage.css" rel="stylesheet" type="text/css" />
+        <style>
+        #zfileup, #up_container {
+            display: none;
+            opacity: 0;
+        }
+
+        div#my_images_panel.current input {
+            width: 75px;
+        }
+
+        .z_images_container {
+            height: 270px;
+            width: 465px;
+            overflow-y: scroll;
+            margin-top: 3px;
+            border: 1px solid gray;
+            background: white;
+        }
+        .container {
+            height: 340px;
+            width: 570px;
+            overflow-y: scroll;
+            margin-top: 3px;
+            border: 1px solid gray;
+            background: white;
+        }
+        div.z_imz_o {
+            width: 90px;
+            height: 93px;
+            background: #ABC6DD;
+            float: left;
+            padding: 5px;
+            margin: 5px;
+            text-align: center;
+            position: relative;
+        }
+
+        div.z_imz_o.active {
+            background: #36C6DD;
+        }
+
+        .z_imz_o > div > img {
+            vertical-align: middle;
+            cursor: pointer;
+        }
+        .z_delete {
+            color: red;
+            font-weight: bold;
+            font-size: 12px;
+            position: absolute;
+            top: -1px;
+            left: 1px;
+            cursor: pointer;
+            display: block;
+        }
+
+        .z_title {
+            font-size: 9px;
+            display: block;
+            text-align: center;
+            margin-top: 3px;
+        }
+        #zfilter {
+            width: 100px;;
+        }
+
+        /***************** tabs *********/
+
+        div.z_tabs {
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        ul.tab_container {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            z-index: 99;
+            margin-bottom: -1px;
+        }
+
+        ul.tab_container li.tab_content {
+            display: none;
+            padding-top: 10px;
+        }
+
+        ul.tab_container li.tab_content.active {
+            display: inline-block;
+        }
+
+        ul.tabNavigation {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            z-index: 99;
+            margin-bottom: -1px;
+        }
+
+        ul.tabNavigation li {
+            display: inline;
+        }
+
+        ul.tabNavigation li a {
+            padding: 3px 9px;
+            background-color: #bbbbbb;
+            color: #000;
+            text-decoration: none;
+        }
+
+        ul.tabNavigation li.selected a,
+        ul.tabNavigation li.selected a:hover {
+            background: #FFF;
+            color: #000;
+            border-top: 1px solid gray;
+            border-left: 1px solid gray;
+            border-right: 1px solid gray;
+        }
+
+        ul.tabNavigation li a:hover {
+            background: #ccc;
+            color: #000;
+        }
+
+        ul.tabNavigation li a:focus {
+            outline: 0;
+        }
+    </style>
+
+
 </head>
 <body id="advimage" style="display: none" role="application" aria-labelledby="app_title">
 	<span id="app_title" style="display:none">{#advimage_dlg.dialog_title}</span>
 	<form onsubmit="ImageDialog.insert();return false;" action="#"> 
 		<div class="tabs">
 			<ul>
-				<li id="general_tab" class="current" aria-controls="general_panel"><span><a href="javascript:mcTabs.displayTab('general_tab','general_panel');" onmousedown="return false;">{#advimage_dlg.tab_general}</a></span></li>
+				<li id="my_images_tab" class="current" aria-controls="my_images_panel"><span><a href="javascript:mcTabs.displayTab('my_images_tab','my_images_panel');" onmousedown="return false;">My images</a></span></li>
+				<li id="general_tab" aria-controls="general_panel"><span><a href="javascript:mcTabs.displayTab('general_tab','general_panel');" onmousedown="return false;">{#advimage_dlg.tab_general}</a></span></li>
 				<li id="appearance_tab" aria-controls="appearance_panel"><span><a href="javascript:mcTabs.displayTab('appearance_tab','appearance_panel');" onmousedown="return false;">{#advimage_dlg.tab_appearance}</a></span></li>
 				<li id="advanced_tab" aria-controls="advanced_panel"><span><a href="javascript:mcTabs.displayTab('advanced_tab','advanced_panel');" onmousedown="return false;">{#advimage_dlg.tab_advanced}</a></span></li>
 			</ul>
 		</div>
 
 		<div class="panel_wrapper">
-			<div id="general_panel" class="panel current">
+			<div id="general_panel" class="panel">
 				<fieldset>
 						<legend>{#advimage_dlg.general}</legend>
 
@@ -224,6 +354,52 @@
 					</table>
 				</fieldset>
 			</div>
+
+			<div id="my_images_panel" class="panel current">
+                    <!--<form enctype="multipart/form-data"  id="zuploadf" method="POST" action="">-->
+                <table style="border:0">
+                    <tr>
+                        <td>
+                            Filter:
+                        </td>
+                        <td>
+                            <input type="text" name="filter" size="20" id="zfilter" onkeyup="ImageDialog.redrawData($(this).val());">
+                        </td>
+                        <td>
+                            Sort By:
+                        </td>
+                        <td>
+                            <select onchange="ImageDialog.order(this);">
+                                <option value="title" selected>Name</option>
+                                <option value="size" selected>File Size</option>
+                                <option value="modified" selected="selected">Last Modified</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div id="up_container">
+                                <input type="file" name="file" size="40" id="zfileup" onchange="ImageDialog.upload(this.form);">
+                            </div>
+                        </td>
+                        <td>
+                            <input type="button" value="Upload" onclick="document.getElementById('zfileup').click();">
+                        </td>
+                        <td>
+                            <span id="z_error" style="color:red; margin-left: 20px"></span>
+                        </td>
+                        <td>
+                            <img src="img/wait.gif" style="display: none;" id="z_wait"/>
+                        </td>
+                    </tr>
+                </table>
+            <!--</form>-->
+            <div class="z_images_container">
+
+                <div id="images_content"></div>
+
+                <div id='upload'></div>
+            </div>
+			</div>
+
 		</div>
 
 		<div class="mceActionPanel">

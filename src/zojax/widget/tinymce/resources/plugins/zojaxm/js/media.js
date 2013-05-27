@@ -16,10 +16,11 @@ var ZojaxDialog = {
     },
 
     formatData : function(data_all) {
-        for(d in data_all) {
+        console.log(data_all.len)
+        for(var d in data_all) {
 
-            data = data_all[d];
-
+            if (parseInt(d) == NaN) continue;
+            var data = data_all[d];
             data.label = (data.title.length > 15)
                 ? data.name.substr(0, 12) + '...' : data.title;
             data.tip = "Name: " + data.title +
@@ -80,7 +81,7 @@ var ZojaxDialog = {
                         ));
 
 
-                document.getElementById('zojaxm'+i).onclick = (function(i){
+                document.getElementById('zojax-image-'+i).onclick = (function(i){
                         return function(){ ZojaxDialog.activateImg(i); }
                     })(i);
 //                document.getElementById('zojaxm'+i).onclick = (function(i){
@@ -195,7 +196,7 @@ tinyMCEPopup.onInit.add(ZojaxDialog.init, ZojaxDialog);
 
 function fileUpload(form, success) {
 
-    action_url = tinyMCE.activeEditor.getParam('url2')+'upload';
+    var action_url = tinyMCE.activeEditor.getParam('url2')+'upload';
 
     var iframe = document.createElement("iframe");
     iframe.setAttribute("id", "upload_iframe");

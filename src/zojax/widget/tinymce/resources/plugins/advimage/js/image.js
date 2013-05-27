@@ -1,5 +1,8 @@
 var ImageDialog = {
     $: {},
+    current_tab: 'my',
+    my_images: {},
+    document_images: {},
 
 	preInit : function() {
 		var url;
@@ -125,33 +128,36 @@ var ImageDialog = {
     },
 
 
-    redrawData: function(filter) {
-
-        var k = tinyMCEPopup.dom.get('images_content');
+    redrawData: function(filter, tab_id) {
+        var k = tinyMCEPopup.dom.get(tab_id);
+        var images, prefix;
+        if (tab_id == 'document_images_content'){
+            images = ImageDialog.document_images;
+            prefix = 'document';
+        } else {
+            images = ImageDialog.my_images;
+            prefix = 'my';
+        }
         $(k).html('');
-        for(var i in ImageDialog.images) {
+        for(var i in images) {
 
-            var m = ImageDialog.images[i];
+            var m = images[i];
 
             if(!filter || filter.trim()=='' || m.title.toUpperCase().indexOf(filter.toUpperCase()) != -1 ) {
                 $(k).append(
-                        $('<div class="z_imz_o" id="zojax-image-'+i+'">' +
-                            '<span title="Delete Image" class="z_delete" id="zojaxd'+i+'">x</span>' +
-                            '<div style=""><img style="margin-top:'+(40-ImageDialog.images[i].thumbheight/2)+'px;" id="zojaxm'+i+'" src="'+ImageDialog.images[i].preview+'"' +
+                        $('<div class="z_imz_o" id="'+prefix+'_img'+i+'">' +
+                            '<span title="Delete Image" class="z_delete" id="'+prefix+'_img-delete'+i+'">x</span>' +
+                            '<div style=""><img style="margin-top:'+(40-images[i].thumbheight/2)+'px;" src="'+images[i].preview+'"' +
                             'title="'+m.tip+'Kb" /></div>' +
-                                '<div class="z_title">'+ImageDialog.images[i].label+'</div>'+
+                                '<div class="z_title">'+images[i].label+'</div>'+
                            '</div>'
                         ));
 
-
-                document.getElementById('zojax-image-'+i).onclick = (function(i){
+                document.getElementById(prefix+'_img'+i).onclick = (function(i){
                         return function(){ ImageDialog.activateImg(i); }
                     })(i);
-//                document.getElementById('zojaxm'+i).onclick = (function(i){
-//                        return function(){ ImageDialog.activateImg(ImageDialog.images[i]); }
-//                    })(i);
-                document.getElementById('zojaxd'+i).onclick = (function(i){
-                        return function(){ ImageDialog.remove(ImageDialog.images[i]); }
+                document.getElementById(prefix+'_img-delete'+i).onclick = (function(i){
+                        return function(){ ImageDialog.remove(images[i]); }
                     })(i);
             }
         }
@@ -159,17 +165,41 @@ var ImageDialog = {
 
     loadData: function(order) {
         if(!order) order = "modified";
-        var params =  {ph:80, pw:80, sort:order};
-        if(order=="title") params.dir = "asc";
+        var my_img_params = {ph:80, pw:80, sort:"modified"};
+        var doc_img_params = {ph:80, pw:80, sort:"modified"};
 
-        $(tinyMCEPopup.dom.get('z_wait')).show();
+        if (order != undefined){
 
-        $.post(tinyMCE.activeEditor.getParam('url2')+'listing', params, function(data) {
-            ImageDialog.images = data.images;
-            ImageDialog.formatData(ImageDialog.images);
-            ImageDialog.redrawData()
-            $(tinyMCEPopup.dom.get('z_wait')).hide();
-        });
+            if (ImageDialog.current_tab=='my'){
+                my_img_params.sort = order;
+            } else {
+                doc_img_params.sort = order;
+            }
+        }
+//        if(order=="title") params.dir = "asc";
+        var baseUrl1 = tinyMCE.activeEditor.getParam('url1');
+        var baseUrl2 = tinyMCE.activeEditor.getParam('url2');
+
+        if (baseUrl1 != undefined) {
+            $(tinyMCEPopup.dom.get('document_images_wait')).show();
+            $.post(baseUrl1+'listing', doc_img_params, function(data) {
+                document.getElementById('document_images_tab').style.display = 'block';
+                ImageDialog['document_images'] = data.images;
+                ImageDialog.formatData(ImageDialog.document_images);
+                ImageDialog.redrawData('','document_images_content')
+                $(tinyMCEPopup.dom.get('document_images_wait')).hide();
+            });
+        }
+        if (baseUrl2 != 'undefined') {
+            $(tinyMCEPopup.dom.get('my_images_wait')).show();
+            $.post(baseUrl2+'listing', my_img_params, function(data) {
+                ImageDialog['my_images'] = data.images;
+                ImageDialog.formatData(ImageDialog.my_images);
+                ImageDialog.redrawData('','my_images_content')
+                $(tinyMCEPopup.dom.get('my_images_wait')).hide();
+            });
+        }
+
     },
 
 
@@ -547,12 +577,12 @@ var ImageDialog = {
 
 
     success : function (d) {
-        $(tinyMCEPopup.dom.get('z_wait')).hide();
+        $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'_images_wait')).hide();
         d = $(d).text().replace('<pre>', '');
         d = d.replace('</pre>', '');
         data = $.parseJSON(d);
         if(!data.success) {
-            $(tinyMCEPopup.dom.get('z_error')).html(data.error);
+            $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'z_error')).html(data.error);
             setTimeout(ImageDialog.hideError, 3000);
         } else {
             ImageDialog.loadData();
@@ -560,8 +590,14 @@ var ImageDialog = {
     },
 
     upload: function(form) {
-        $(tinyMCEPopup.dom.get('z_wait')).show();
-        fileUpload(form, ImageDialog.success);
+        var url;
+        $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'_images_wait')).show();
+        if (ImageDialog.current_tab =='my'){
+            url = tinyMCE.activeEditor.getParam('url2');
+        } else {
+            url = tinyMCE.activeEditor.getParam('url1');
+        }
+        fileUpload(form, url+'upload', ImageDialog.success);
     },
 
     order: function(sel) {
@@ -570,19 +606,17 @@ var ImageDialog = {
 
     remove: function(image) {
        if(confirm("Delete image "+image.title)) {
-            $(tinyMCEPopup.dom.get('z_wait')).show();
+            $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'_images_wait')).show();
             $.post(tinyMCE.activeEditor.getParam('url2')+'remove', {image: image.title}, function(data) {
                 ImageDialog.loadData();
-                $(tinyMCEPopup.dom.get('z_wait')).hide();
+                $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'_images_wait')).hide();
             });
        }
     },
-
-
     activateImg: function(image) {
-        $(tinyMCEPopup.dom.get('images_content').children).removeClass('active');
-        $(tinyMCEPopup.dom.get('zojax-image-'+image)).addClass('active');
-        ImageDialog.setImageInfo(ImageDialog.images[image]);
+        $(tinyMCEPopup.dom.get(ImageDialog.current_tab + '_images_content').children).removeClass('active');
+        $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'_img'+image)).addClass('active');
+        ImageDialog.setImageInfo(ImageDialog[ImageDialog.current_tab+'_images'][image]);
     },
 
     setImageInfo: function(image) {
@@ -599,11 +633,11 @@ var ImageDialog = {
 ImageDialog.preInit();
 tinyMCEPopup.onInit.add(ImageDialog.init, ImageDialog);
 
-function fileUpload(form, success) {
-
-    var action_url = tinyMCE.activeEditor.getParam('url2')+'upload';
+function fileUpload(form, action_url, success) {
 
     var iframe = document.createElement("iframe");
+    var input = document.createElement("input");
+
     iframe.setAttribute("id", "upload_iframe");
     iframe.setAttribute("name", "upload_iframe");
     iframe.setAttribute("width", "0");
@@ -613,6 +647,16 @@ function fileUpload(form, success) {
 
     // Add to document...
     form.parentNode.appendChild(iframe);
+    form.parentNode.appendChild(iframe);
+
+    if (ImageDialog.current_tab == 'my') {
+        form.my_img_file.name = 'file';
+        form.document_img_file.value = '';
+    } else {
+        form.document_img_file.name = 'file';
+        form.my_img_file.value = '';
+    }
+
     window.frames['upload_iframe'].name = "upload_iframe";
 
     iframeId = document.getElementById("upload_iframe");
@@ -645,4 +689,11 @@ function fileUpload(form, success) {
     form.setAttribute("encoding", "multipart/form-data");
 
     form.submit();
+    if (ImageDialog.current_tab == 'my') {
+        form.file.name = 'my_img_file';
+    } else {
+        form.file.name = 'document_img_file';
+    }
+    form.my_img_file.value = '';
+    form.document_img_file.value = '';
 }

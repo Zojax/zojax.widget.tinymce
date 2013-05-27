@@ -19,7 +19,7 @@ var ZojaxDialog = {
         console.log(data_all.len)
         for(var d in data_all) {
 
-            if (parseInt(d) == NaN) continue;
+            if (isNaN(parseInt(d))) continue;
             var data = data_all[d];
             data.label = (data.title.length > 15)
                 ? data.name.substr(0, 12) + '...' : data.title;

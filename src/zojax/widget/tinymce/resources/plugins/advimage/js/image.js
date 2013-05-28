@@ -8,7 +8,7 @@ var ImageDialog = {
     api_url: tinyMCE.activeEditor.getParam('url2'),
     imageMaxWidth: 480,
     imageMaxHeight: 360,
-    pageSize: 5,
+    pageSize: 30,
     page: 1,
     pages_count: 1,
 

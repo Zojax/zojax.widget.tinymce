@@ -185,6 +185,8 @@ var ImageDialog = {
             ImageDialog.pages_count = Math.ceil(data.total/ImageDialog.pageSize);
             document.getElementById(ImageDialog.current_tab+'_total_pages').innerHTML = ImageDialog.pages_count;
             document.getElementById(ImageDialog.current_tab+'_current_page').value = ImageDialog.page;
+            if (ImageDialog.pages_count > 1)
+                document.getElementById(ImageDialog.current_tab+'_paginator').style.display = 'block';
         });
     },
 

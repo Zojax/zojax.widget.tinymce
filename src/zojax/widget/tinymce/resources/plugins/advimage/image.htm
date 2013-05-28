@@ -265,7 +265,7 @@
                     <div id="my_images_content"></div>
                     <div id='upload1'></div>
                 </div>
-                <div class="paginator">
+                <div class="paginator" style="display: none" id="my_paginator">
                     <a href="javascript:void(0)" onclick="javascript:ImageDialog.firstPage();">&lt;&lt;</a>
                     <a href="javascript:void(0)" onclick="javascript:ImageDialog.prevPage();">&lt;</a>
                     <input id="my_current_page" type="text" value="1" name="page" onchange="javascript:ImageDialog.toPage(this.value)"/> of <span id="my_total_pages">1</span>
@@ -314,7 +314,7 @@
 
                     <div id='upload2'></div>
                 </div>
-                <div class="paginator">
+                <div class="paginator" style="display: none" id="document_paginator">
                     <a href="javascript:void(0)" onclick="javascript:ImageDialog.firstPage();">&lt;&lt;</a>
                     <a href="javascript:void(0)" onclick="javascript:ImageDialog.prevPage();">&lt;</a>
                     <input id="document_current_page" type="text" value="1" name="page" onchange="javascript:ImageDialog.toPage(this.value)"/> of <span id="document_total_pages">1</span>

@@ -140,19 +140,11 @@ var ImageDialog = {
     redrawData: function(filter, tab_id) {
         var k = tinyMCEPopup.dom.get(tab_id);
         var images, prefix;
-//        if (tab_id == 'document_images_content'){
-//            images = ImageDialog.document_images;
-//            prefix = 'document';
-//        } else {
-//            images = ImageDialog.my_images;
-//            prefix = 'my';
-//        }
         images = ImageDialog.images;
         $(k).html('');
         for(var i in images) {
-
+            if (isNaN(parseInt(i))) continue;
             var m = images[i];
-
             if(!filter || filter.trim()=='' || m.title.toUpperCase().indexOf(filter.toUpperCase()) != -1 ) {
                 $(k).append(
                         $('<div class="z_imz_o" id="_img'+ m.id +'">' +
@@ -176,7 +168,6 @@ var ImageDialog = {
     loadData: function(order) {
         if(!order) order = "modified";
 
-//        ImageDialog.page = (0 < ImageDialog.page) && (ImageDialog.page < ImageDialog.pages_count) ? ImageDialog.page: ImageDialog.pages_count;
         var params = {
             ph:80,
             pw:80,
@@ -184,8 +175,6 @@ var ImageDialog = {
             limit: ImageDialog.pageSize,
             start: (ImageDialog.page -1) * ImageDialog.pageSize
         };
-
-//        var baseUrl2 = tinyMCE.activeEditor.getParam('url2');
 
         $(tinyMCEPopup.dom.get('document_images_wait')).show();
         $.post(ImageDialog.api_url+'listing', params, function(data) {
@@ -197,7 +186,6 @@ var ImageDialog = {
             document.getElementById(ImageDialog.current_tab+'_total_pages').innerHTML = ImageDialog.pages_count;
             document.getElementById(ImageDialog.current_tab+'_current_page').value = ImageDialog.page;
         });
-
     },
 
 	insert : function(original) {
@@ -653,22 +641,38 @@ var ImageDialog = {
             ImageDialog.page = ImageDialog.page < ImageDialog.pages_count ? ImageDialog.page + 1: ImageDialog.pages_count;
             ImageDialog.loadData();
         }
+        return false;
     },
     prevPage: function () {
         if (ImageDialog.page - 1 >= 1){
             ImageDialog.page = ImageDialog.page > 1 ? ImageDialog.page-1: 1;
             ImageDialog.loadData();
         }
+        return false;
     },
     toPage: function (n) {
-        ImageDialog.page = n;
-        ImageDialog.loadData();
+        var p = parseInt(n);
+        if (!isNaN(p)){
+            p = (0 < p) && (p < ImageDialog.pages_count) ? p: ImageDialog.pages_count;
+            if (p != ImageDialog.page) {
+                ImageDialog.page = p;
+                ImageDialog.loadData();
+            }
+            document.getElementById(ImageDialog.current_tab+'_current_page').value = p;
+        } else {
+            document.getElementById(ImageDialog.current_tab+'_current_page').value = ImageDialog.page;
+        }
+        return false;
     },
     lastPage: function () {
-        ImageDialog.toPage(ImageDialog.pages_count);
+        if (ImageDialog.page != ImageDialog.pages_count)
+            ImageDialog.toPage(ImageDialog.pages_count);
+        return false;
     },
     firstPage: function () {
-        ImageDialog.toPage(1);
+        if (ImageDialog.page != 1)
+            ImageDialog.toPage(1);
+        return false;
     }
 
 };

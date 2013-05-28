@@ -37,6 +37,12 @@ div#document_images_panel.current input {
     width: 75px;
 }
 
+div.paginator input#document_current_page,
+div.paginator input#my_current_page{
+    width: 20px;
+    text-align: center;
+}
+
 .z_images_container {
     height: 270px;
     width: 465px;

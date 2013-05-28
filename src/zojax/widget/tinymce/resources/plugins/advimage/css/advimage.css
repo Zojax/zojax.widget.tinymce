@@ -11,3 +11,18 @@
 input {width: 280px;}
 #constrain, #onmousemovecheck {width:auto;}
 #id, #dir, #lang, #usemap, #longdesc {width:200px;}
+
+#insert-original {
+    background: url("../img/buttons.png") repeat scroll 0 -104px transparent;
+    border: 0 none;
+    cursor: pointer;
+    float: left;
+    font-weight: bold;
+    height: 26px;
+    margin: 0;
+    padding: 0 0 2px;
+    width: 94px;
+}
+#insert-original {
+    background: url("../img/buttons.png") repeat scroll 0 -104px transparent;
+}

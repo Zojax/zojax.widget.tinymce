@@ -1,8 +1,12 @@
 var ImageDialog = {
     $: {},
     current_tab: 'my',
+    current_image: {},
     my_images: {},
     document_images: {},
+    api_url: tinyMCE.activeEditor.getParam('url2'),
+    imageMaxWidth: 480,
+    imageMaxHeight: 360,
 
 	preInit : function() {
 		var url;
@@ -26,8 +30,8 @@ var ImageDialog = {
 
 		if (n.nodeName == 'IMG') {
 			nl.src.value = dom.getAttrib(n, 'src');
-			nl.width.value = dom.getAttrib(n, 'width');
-			nl.height.value = dom.getAttrib(n, 'height');
+//			nl.width.value = dom.getAttrib(n, 'width');
+//			nl.height.value = dom.getAttrib(n, 'height');
 			nl.alt.value = dom.getAttrib(n, 'alt');
 			nl.title.value = dom.getAttrib(n, 'title');
 			nl.vspace.value = this.getAttrib(n, 'vspace');
@@ -95,7 +99,6 @@ var ImageDialog = {
         this.loadData();
 	},
 
-
     formatData : function(data_all) {
         for(var d in data_all) {
 
@@ -127,7 +130,6 @@ var ImageDialog = {
         }
     },
 
-
     redrawData: function(filter, tab_id) {
         var k = tinyMCEPopup.dom.get(tab_id);
         var images, prefix;
@@ -145,18 +147,18 @@ var ImageDialog = {
 
             if(!filter || filter.trim()=='' || m.title.toUpperCase().indexOf(filter.toUpperCase()) != -1 ) {
                 $(k).append(
-                        $('<div class="z_imz_o" id="'+prefix+'_img'+i+'">' +
-                            '<span title="Delete Image" class="z_delete" id="'+prefix+'_img-delete'+i+'">x</span>' +
-                            '<div style=""><img style="margin-top:'+(40-images[i].thumbheight/2)+'px;" src="'+images[i].preview+'"' +
+                        $('<div class="z_imz_o" id="_img'+ m.id +'">' +
+                            '<span title="Delete Image" class="z_delete" id="img-delete'+ m.id+'">x</span>' +
+                            '<div style=""><img style="margin-top:'+(40-m.thumbheight/2)+'px;" src="'+m.preview+'"' +
                             'title="'+m.tip+'Kb" /></div>' +
-                                '<div class="z_title">'+images[i].label+'</div>'+
+                                '<div class="z_title">'+m.label+'</div>'+
                            '</div>'
                         ));
 
-                document.getElementById(prefix+'_img'+i).onclick = (function(i){
-                        return function(){ ImageDialog.activateImg(i); }
-                    })(i);
-                document.getElementById(prefix+'_img-delete'+i).onclick = (function(i){
+                document.getElementById('_img'+ m.id).onclick = (function(m){
+                        return function(){ ImageDialog.activateImg(m); }
+                    })(m);
+                document.getElementById('img-delete'+ m.id).onclick = (function(i){
                         return function(){ ImageDialog.remove(images[i]); }
                     })(i);
             }
@@ -202,9 +204,8 @@ var ImageDialog = {
 
     },
 
-
-
-	insert : function(file, title) {
+	insert : function(original) {
+        original = typeof original !== 'undefined' ? original : false;
 		var ed = tinyMCEPopup.editor, t = this, f = document.forms[0];
 
 		if (f.src.value === '') {
@@ -213,7 +214,7 @@ var ImageDialog = {
 				ed.execCommand('mceRepaint');
 			}
 
-			tinyMCEPopup.close();
+//			tinyMCEPopup.close();
 			return;
 		}
 
@@ -221,18 +222,26 @@ var ImageDialog = {
 			if (!f.alt.value) {
 				tinyMCEPopup.confirm(tinyMCEPopup.getLang('advimage_dlg.missing_alt'), function(s) {
 					if (s)
-						t.insertAndClose();
+						t.insertAndClose(original);
 				});
 
 				return;
 			}
 		}
 
-		t.insertAndClose();
+		t.insertAndClose(original);
 	},
 
-	insertAndClose : function() {
-		var ed = tinyMCEPopup.editor, f = document.forms[0], nl = f.elements, v, args = {}, el;
+    insertOriginal: function(){
+        var f = document.forms[0], nl = f.elements;
+        nl.width.value = ImageDialog.current_image.width;
+        nl.height.value = ImageDialog.current_image.height;
+        ImageDialog.insert(true);
+    },
+
+	insertAndClose : function(original) {
+        original = typeof original !== 'undefined' ? original : false;
+		var ed = tinyMCEPopup.editor, f = document.forms[0], nl = f.elements, args = {}, el;
 
 		tinyMCEPopup.restoreSelection();
 
@@ -258,9 +267,7 @@ var ImageDialog = {
 		}
 
 		tinymce.extend(args, {
-			src : nl.src.value.replace(/ /g, '%20'),
-			width : nl.width.value,
-			height : nl.height.value,
+			src : original ? nl.src.value.replace(/ /g, '%20'): nl.src.value.replace(/ /g, '%20') + '/preview/'+ nl.width.value+'x'+nl.height.value,
 			alt : nl.alt.value,
 			title : nl.title.value,
 			'class' : getSelectValue(f, 'class_list'),
@@ -430,8 +437,8 @@ var ImageDialog = {
 		var f = document.forms[0];
 
 		if (!st) {
-			f.elements.width.value = img.width;
-			f.elements.height.value = img.height;
+			f.elements.width.value = img.width > ImageDialog.imageMaxWidth ? ImageDialog.imageMaxWidth : img.width;
+			f.elements.height.value = img.height > ImageDialog.imageMaxHeight ? ImageDialog.imageMaxHeight : img.height;
 		}
 
 		this.preloadImg = img;
@@ -555,9 +562,6 @@ var ImageDialog = {
 		}
 	},
 
-	changeMouseMove : function() {
-	},
-
 	showPreviewImage : function(u, st) {
 		if (!u) {
 			tinyMCEPopup.dom.setHTML('prev', '');
@@ -575,7 +579,6 @@ var ImageDialog = {
 			tinyMCEPopup.dom.setHTML('prev', '<img id="previewImg" src="' + u + '" border="0" onload="ImageDialog.updateImageData(this, 1);" />');
     },
 
-
     success : function (d) {
         $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'_images_wait')).hide();
         d = $(d).text().replace('<pre>', '');
@@ -592,12 +595,7 @@ var ImageDialog = {
     upload: function(form) {
         var url;
         $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'_images_wait')).show();
-        if (ImageDialog.current_tab =='my'){
-            url = tinyMCE.activeEditor.getParam('url2');
-        } else {
-            url = tinyMCE.activeEditor.getParam('url1');
-        }
-        fileUpload(form, url+'upload', ImageDialog.success);
+        fileUpload(form, ImageDialog.api_url+'upload', ImageDialog.success);
     },
 
     order: function(sel) {
@@ -607,26 +605,50 @@ var ImageDialog = {
     remove: function(image) {
        if(confirm("Delete image "+image.title)) {
             $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'_images_wait')).show();
-            $.post(tinyMCE.activeEditor.getParam('url2')+'remove', {image: image.title}, function(data) {
+            $.post(ImageDialog.api_url+'remove', {image: image.title}, function(data) {
+                ImageDialog.clearImageInfo();
+                ImageDialog.resetImageData();
                 ImageDialog.loadData();
                 $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'_images_wait')).hide();
             });
        }
     },
+
     activateImg: function(image) {
-        $(tinyMCEPopup.dom.get(ImageDialog.current_tab + '_images_content').children).removeClass('active');
-        $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'_img'+image)).addClass('active');
-        ImageDialog.setImageInfo(ImageDialog[ImageDialog.current_tab+'_images'][image]);
+        $(tinyMCEPopup.dom.get('my_images_content').children).removeClass('active');
+        $(tinyMCEPopup.dom.get('document_images_content').children).removeClass('active');
+        $(tinyMCEPopup.dom.get('_img'+ image.id)).addClass('active');
+        ImageDialog.current_image =  image;
+        ImageDialog.setImageInfo();
     },
 
-    setImageInfo: function(image) {
-        var ed = tinyMCEPopup.editor, f = document.forms[0], nl = f.elements, v, args = {}, el;
+    setImageInfo: function() {
+        var image = ImageDialog.current_image;
+        var f = document.forms[0], nl = f.elements;
         nl.src.value = image.url;
         nl.alt.value = image.name;
         nl.title.value = image.label;
         ImageDialog.showPreviewImage(nl.src.value);
-    }
+    },
 
+    clearImageInfo: function() {
+        var f = document.forms[0], nl = f.elements;
+        nl.src.value = '';
+        nl.alt.value = '';
+        nl.title.value = '';
+        nl.width.value = '';
+        nl.height.value = '';
+        ImageDialog.showPreviewImage(nl.src.value);
+    },
+
+    changeImageTab: function (tab) {
+        ImageDialog.current_tab = tab;
+        if (tab == 'document') {
+            ImageDialog.api_url = tinyMCE.activeEditor.getParam('url1');
+        } else {
+            ImageDialog.api_url = tinyMCE.activeEditor.getParam('url2');
+        }
+    }
 
 };
 

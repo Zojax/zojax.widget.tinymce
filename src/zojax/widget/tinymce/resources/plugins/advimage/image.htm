@@ -145,8 +145,8 @@
 	<form onsubmit="ImageDialog.insert();return false;" action="#"> 
 		<div class="tabs">
 			<ul>
-				<li id="my_images_tab" class="current" aria-controls="my_images_panel"><span><a href="javascript:ImageDialog.current_tab='my';mcTabs.displayTab('my_images_tab','my_images_panel');" onmousedown="return false;">My images</a></span></li>
-				<li id="document_images_tab" style="display: none" aria-controls="my_images_panel"><span><a href="javascript:ImageDialog.current_tab='document';mcTabs.displayTab('document_images_tab','document_images_panel');" onmousedown="return false;">Document images</a></span></li>
+				<li id="my_images_tab" class="current" aria-controls="my_images_panel"><span><a href="javascript:ImageDialog.changeImageTab('my');mcTabs.displayTab('my_images_tab','my_images_panel');" onmousedown="return false;">My images</a></span></li>
+				<li id="document_images_tab" style="display: none" aria-controls="my_images_panel"><span><a href="javascript:ImageDialog.changeImageTab('document');mcTabs.displayTab('document_images_tab','document_images_panel');" onmousedown="return false;">Document images</a></span></li>
 				<li id="general_tab" aria-controls="general_panel"><span><a href="javascript:mcTabs.displayTab('general_tab','general_panel');" onmousedown="return false;">{#advimage_dlg.tab_general}</a></span></li>
 				<li id="appearance_tab" aria-controls="appearance_panel"><span><a href="javascript:mcTabs.displayTab('appearance_tab','appearance_panel');" onmousedown="return false;">{#advimage_dlg.tab_appearance}</a></span></li>
 				<li id="advanced_tab" aria-controls="advanced_panel"><span><a href="javascript:mcTabs.displayTab('advanced_tab','advanced_panel');" onmousedown="return false;">{#advimage_dlg.tab_advanced}</a></span></li>
@@ -223,7 +223,7 @@
 							<td class="column1"><label id="widthlabel" for="width">{#advimage_dlg.dimensions}</label></td>
 							<td class="nowrap">
 								<span style="display:none" id="width_voiceLabel">{#advimage_dlg.width}</span>
-								<input name="width" type="text" id="width" value="" size="5" maxlength="5" class="size" onchange="ImageDialog.changeHeight();" aria-labelledby="width_voiceLabel" /> x 
+								<input name="width" type="text" id="width" value="" size="5" maxlength="5" class="size" onchange="ImageDialog.changeHeight();" aria-labelledby="width_voiceLabel" /> x
 								<span style="display:none" id="height_voiceLabel">{#advimage_dlg.height}</span>
 								<input name="height" type="text" id="height" value="" size="5" maxlength="5" class="size" onchange="ImageDialog.changeWidth();" aria-labelledby="height_voiceLabel" /> px
 							</td>
@@ -445,6 +445,7 @@
 
 		<div class="mceActionPanel">
 			<input type="submit" id="insert" name="insert" value="{#insert}" />
+			<input type="button" id="insert-original" name="insert-original" value="Insert original" onclick="ImageDialog.insertOriginal();"/>
 			<input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
 		</div>
 	</form>

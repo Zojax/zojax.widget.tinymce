@@ -2,11 +2,15 @@ var ImageDialog = {
     $: {},
     current_tab: 'my',
     current_image: {},
+    images: {},
     my_images: {},
     document_images: {},
     api_url: tinyMCE.activeEditor.getParam('url2'),
     imageMaxWidth: 480,
     imageMaxHeight: 360,
+    pageSize: 5,
+    page: 1,
+    pages_count: 1,
 
 	preInit : function() {
 		var url;
@@ -94,6 +98,9 @@ var ImageDialog = {
 		else
 			this.setSwapImage(false);
 
+        if (tinyMCE.activeEditor.getParam('url1') != undefined) {
+            document.getElementById('document_images_tab').style.display = 'block';
+        }
 		this.changeAppearance();
 		this.showPreviewImage(nl.src.value, 1);
         this.loadData();
@@ -133,13 +140,14 @@ var ImageDialog = {
     redrawData: function(filter, tab_id) {
         var k = tinyMCEPopup.dom.get(tab_id);
         var images, prefix;
-        if (tab_id == 'document_images_content'){
-            images = ImageDialog.document_images;
-            prefix = 'document';
-        } else {
-            images = ImageDialog.my_images;
-            prefix = 'my';
-        }
+//        if (tab_id == 'document_images_content'){
+//            images = ImageDialog.document_images;
+//            prefix = 'document';
+//        } else {
+//            images = ImageDialog.my_images;
+//            prefix = 'my';
+//        }
+        images = ImageDialog.images;
         $(k).html('');
         for(var i in images) {
 
@@ -167,40 +175,28 @@ var ImageDialog = {
 
     loadData: function(order) {
         if(!order) order = "modified";
-        var my_img_params = {ph:80, pw:80, sort:"modified"};
-        var doc_img_params = {ph:80, pw:80, sort:"modified"};
 
-        if (order != undefined){
+//        ImageDialog.page = (0 < ImageDialog.page) && (ImageDialog.page < ImageDialog.pages_count) ? ImageDialog.page: ImageDialog.pages_count;
+        var params = {
+            ph:80,
+            pw:80,
+            sort:order,
+            limit: ImageDialog.pageSize,
+            start: (ImageDialog.page -1) * ImageDialog.pageSize
+        };
 
-            if (ImageDialog.current_tab=='my'){
-                my_img_params.sort = order;
-            } else {
-                doc_img_params.sort = order;
-            }
-        }
-//        if(order=="title") params.dir = "asc";
-        var baseUrl1 = tinyMCE.activeEditor.getParam('url1');
-        var baseUrl2 = tinyMCE.activeEditor.getParam('url2');
+//        var baseUrl2 = tinyMCE.activeEditor.getParam('url2');
 
-        if (baseUrl1 != undefined) {
-            $(tinyMCEPopup.dom.get('document_images_wait')).show();
-            $.post(baseUrl1+'listing', doc_img_params, function(data) {
-                document.getElementById('document_images_tab').style.display = 'block';
-                ImageDialog['document_images'] = data.images;
-                ImageDialog.formatData(ImageDialog.document_images);
-                ImageDialog.redrawData('','document_images_content')
-                $(tinyMCEPopup.dom.get('document_images_wait')).hide();
-            });
-        }
-        if (baseUrl2 != 'undefined') {
-            $(tinyMCEPopup.dom.get('my_images_wait')).show();
-            $.post(baseUrl2+'listing', my_img_params, function(data) {
-                ImageDialog['my_images'] = data.images;
-                ImageDialog.formatData(ImageDialog.my_images);
-                ImageDialog.redrawData('','my_images_content')
-                $(tinyMCEPopup.dom.get('my_images_wait')).hide();
-            });
-        }
+        $(tinyMCEPopup.dom.get('document_images_wait')).show();
+        $.post(ImageDialog.api_url+'listing', params, function(data) {
+            ImageDialog.images = data.images;
+            ImageDialog.formatData(ImageDialog.images);
+            ImageDialog.redrawData('',ImageDialog.current_tab+'_images_content')
+            $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'_images_wait')).hide();
+            ImageDialog.pages_count = Math.ceil(data.total/ImageDialog.pageSize);
+            document.getElementById(ImageDialog.current_tab+'_total_pages').innerHTML = ImageDialog.pages_count;
+            document.getElementById(ImageDialog.current_tab+'_current_page').value = ImageDialog.page;
+        });
 
     },
 
@@ -648,6 +644,31 @@ var ImageDialog = {
         } else {
             ImageDialog.api_url = tinyMCE.activeEditor.getParam('url2');
         }
+        ImageDialog.page = 1;
+        ImageDialog.loadData();
+    },
+
+    nextPage: function () {
+        if (ImageDialog.page + 1 <= ImageDialog.pages_count){
+            ImageDialog.page = ImageDialog.page < ImageDialog.pages_count ? ImageDialog.page + 1: ImageDialog.pages_count;
+            ImageDialog.loadData();
+        }
+    },
+    prevPage: function () {
+        if (ImageDialog.page - 1 >= 1){
+            ImageDialog.page = ImageDialog.page > 1 ? ImageDialog.page-1: 1;
+            ImageDialog.loadData();
+        }
+    },
+    toPage: function (n) {
+        ImageDialog.page = n;
+        ImageDialog.loadData();
+    },
+    lastPage: function () {
+        ImageDialog.toPage(ImageDialog.pages_count);
+    },
+    firstPage: function () {
+        ImageDialog.toPage(1);
     }
 
 };

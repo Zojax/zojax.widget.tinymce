@@ -1,7 +1,7 @@
 var ImageDialog = {
     $: {},
     current_tab: 'my',
-    current_image: {},
+    current_image: null,
     images: {},
     my_images: {},
     document_images: {},
@@ -31,11 +31,11 @@ var ImageDialog = {
 		this.fillFileList('out_list', fl);
 		TinyMCE_EditableSelects.init();
         $ = tinyMCE.activeEditor.getWin().parent.jQuery;
-
 		if (n.nodeName == 'IMG') {
+            var dimensions = this.dimansionsFromSrc(nl.src.value)
 			nl.src.value = dom.getAttrib(n, 'src');
-//			nl.width.value = dom.getAttrib(n, 'width');
-//			nl.height.value = dom.getAttrib(n, 'height');
+			nl.width.value = (dimensions != null) && (dimensions.len == 3) ? dimensions[1] : dom.getAttrib(n, 'width');
+			nl.height.value = (dimensions != null) && (dimensions.len == 3) ? dimensions[2] : dom.getAttrib(n, 'height');
 			nl.alt.value = dom.getAttrib(n, 'alt');
 			nl.title.value = dom.getAttrib(n, 'title');
 			nl.vspace.value = this.getAttrib(n, 'vspace');
@@ -220,8 +220,9 @@ var ImageDialog = {
 
     insertOriginal: function(){
         var f = document.forms[0], nl = f.elements;
-        nl.width.value = ImageDialog.current_image.width;
-        nl.height.value = ImageDialog.current_image.height;
+        nl.width.value = this.preloadImg.width;
+        nl.height.value = this.preloadImg.height;
+//        nl.height.value = ImageDialog.current_image.height;
         ImageDialog.insert(true);
     },
 
@@ -253,7 +254,9 @@ var ImageDialog = {
 		}
 
 		tinymce.extend(args, {
-			src : original ? nl.src.value.replace(/ /g, '%20'): nl.src.value.replace(/ /g, '%20') + '/preview/'+ nl.width.value+'x'+nl.height.value,
+			src : original || this.isExternalImg() ? nl.src.value.replace(/ /g, '%20'): nl.src.value.replace(/ /g, '%20') + '/preview/'+ nl.width.value+'x'+nl.height.value,
+            width: nl.width.value,
+            height: nl.height.value,
 			alt : nl.alt.value,
 			title : nl.title.value,
 			'class' : getSelectValue(f, 'class_list'),
@@ -636,6 +639,16 @@ var ImageDialog = {
         }
         ImageDialog.page = 1;
         ImageDialog.loadData();
+    },
+
+    dimansionsFromSrc: function (src){
+        var regexp = /(\d+)x(\d+)/
+        return regexp.exec(src)
+    },
+
+    isExternalImg: function() {
+        var f = document.forms[0], nl = f.elements;
+        return nl.src.value.match(/^http/) != null || this.current_image != null;
     },
 
     nextPage: function () {

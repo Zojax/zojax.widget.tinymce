@@ -253,10 +253,13 @@ var ImageDialog = {
 			};
 		}
 
+
+        console.log(nl.style.value);
+        console.log('H', this.isExternalImg() ? nl.height.value: '');
 		tinymce.extend(args, {
 			src : original || this.isExternalImg() ? nl.src.value.replace(/ /g, '%20'): nl.src.value.replace(/ /g, '%20') + '/preview/'+ nl.width.value+'x'+nl.height.value,
-            width: nl.width.value,
-            height: nl.height.value,
+            width: original || this.isExternalImg() ? nl.width.value: '',
+            height: original || this.isExternalImg() ? nl.height.value: '',
 			alt : nl.alt.value,
 			title : nl.title.value,
 			'class' : getSelectValue(f, 'class_list'),
@@ -280,7 +283,7 @@ var ImageDialog = {
 
 		el = ed.selection.getNode();
 
-		if (el && el.nodeName == 'IMG') {
+        if (el && el.nodeName == 'IMG') {
 			ed.dom.setAttribs(el, args);
 		} else {
 			tinymce.each(args, function(value, name) {
@@ -648,7 +651,7 @@ var ImageDialog = {
 
     isExternalImg: function() {
         var f = document.forms[0], nl = f.elements;
-        return nl.src.value.match(/^http/) != null || this.current_image != null;
+        return nl.src.value.match(/^http/) != null || this.current_image == null;
     },
 
     nextPage: function () {

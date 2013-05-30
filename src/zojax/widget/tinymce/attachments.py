@@ -7,7 +7,7 @@ This is based on zojax.content.attachment.browser.jsapy
 from simplejson import JSONEncoder
 
 from zope.publisher.browser import BrowserPage
-from zope.traversing.api import getName
+from zope.traversing.api import getName, getPath
 from zope.component import getUtility
 from zope.proxy import removeAllProxies
 from zope.app.intid.interfaces import IIntIds
@@ -26,7 +26,7 @@ class ImageList(BrowserPage):
             if IImage.providedBy(image) and image:
                 id = ids.queryId(removeAllProxies(image))
                 title = image.title or getName(image)
-                data.append((title,  '++attachment++%s' % id))
+                data.append((title,  '@@content.attachment/%s' % id))
 
         data.sort()
         js_encoded = encoder.encode(data)

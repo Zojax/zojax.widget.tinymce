@@ -208,15 +208,36 @@ var ImageDialog = {
 			if (!f.alt.value) {
 				tinyMCEPopup.confirm(tinyMCEPopup.getLang('advimage_dlg.missing_alt'), function(s) {
 					if (s)
-						t.insertAndClose(original);
+                        t.checkUrl(f.src.value, t.insertAndClose, original);
 				});
-
 				return;
 			}
 		}
 
-		t.insertAndClose(original);
+		t.checkUrl(f.src.value, t.insertAndClose, original);
 	},
+
+
+    checkUrl: function (url, callback) {
+        var args = Array.prototype.slice.call(arguments).slice(2);
+        var x = new XMLHttpRequest();
+        x.onreadystatechange = function() {
+            if (x.readyState === x.DONE) {
+                var ct = this.getResponseHeader('content-type');
+                if (ct != null && ct.contains('image')) {
+                    return callback.apply(ImageDialog, args);
+                } else {
+                    tinyMCEPopup.confirm(tinyMCEPopup.getLang('advimage_dlg.incorrect_url'), function(s) {
+                        if (s)
+                            return callback.apply(ImageDialog, args);
+                    });
+                }
+            }
+        };
+        x.open('HEAD', url, true);
+        x.send();
+
+    },
 
     insertOriginal: function(){
         var f = document.forms[0], nl = f.elements;
@@ -253,9 +274,6 @@ var ImageDialog = {
 			};
 		}
 
-
-        console.log(nl.style.value);
-        console.log('H', this.isExternalImg() ? nl.height.value: '');
 		tinymce.extend(args, {
 			src : original || this.isExternalImg() ? nl.src.value.replace(/ /g, '%20'): nl.src.value.replace(/ /g, '%20') + '/preview/'+ nl.width.value+'x'+nl.height.value,
             width: original || this.isExternalImg() ? nl.width.value: '',

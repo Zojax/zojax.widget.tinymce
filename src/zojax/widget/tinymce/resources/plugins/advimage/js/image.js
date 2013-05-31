@@ -139,6 +139,9 @@ var ImageDialog = {
         var tab = tinyMCEPopup.dom.get(tab_id);
         var images;
         images = ImageDialog.images;
+        tab.innerHTML = '';
+        ImageDialog.clearImageInfo();
+        ImageDialog.resetImageData();
         for(var i in images) {
             if (isNaN(parseInt(i))) continue;
             var m = images[i];

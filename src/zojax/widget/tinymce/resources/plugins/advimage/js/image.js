@@ -183,7 +183,29 @@ var ImageDialog = {
             start: (ImageDialog.page -1) * ImageDialog.pageSize
         };
 
+        encoded_params = ImageDialog.encodeParams(params)
+
         ImageDialog.showWait();
+
+//        var x = new XMLHttpRequest();
+//        x.onreadystatechange = function() {
+//            if (x.readyState === x.DONE) {
+//                data = JSON.parse(x.responseText);
+//                ImageDialog.images = data.images;
+//                ImageDialog.formatData(ImageDialog.images);
+//                ImageDialog.redrawData('',ImageDialog.current_tab+'_images_content');
+//                ImageDialog.hideWait();
+//                ImageDialog.pages_count = Math.ceil(data.total/ImageDialog.pageSize);
+//                document.getElementById(ImageDialog.current_tab+'_total_pages').innerHTML = ImageDialog.pages_count;
+//                document.getElementById(ImageDialog.current_tab+'_current_page').value = ImageDialog.page;
+//                if (ImageDialog.pages_count > 1)
+//                    document.getElementById(ImageDialog.current_tab+'_paginator').style.display = 'block';
+//            }
+//        };
+//        x.open('POST', ImageDialog.api_url+'listing');
+//        x.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+//        x.send(encoded_params);
+
         $.post(ImageDialog.api_url+'listing', params, function(data) {
             ImageDialog.images = data.images;
             ImageDialog.formatData(ImageDialog.images);
@@ -244,7 +266,6 @@ var ImageDialog = {
         };
         x.open('HEAD', url, true);
         x.send();
-
     },
 
     insertOriginal: function(){
@@ -619,17 +640,29 @@ var ImageDialog = {
     },
 
     remove: function(image) {
-       if(confirm("Delete image "+image.title)) {
+        if(confirm("Delete image "+image.title +"?")) {
             this.showWait();
 
-
-            $.post(ImageDialog.api_url+'remove', {image: image.title}, function(data) {
+        var x = new XMLHttpRequest();
+        x.onreadystatechange = function() {
+            if (x.readyState === x.DONE) {
                 ImageDialog.clearImageInfo();
                 ImageDialog.resetImageData();
                 ImageDialog.loadData();
                 ImageDialog.hideWait();
-            });
-       }
+            }
+        };
+        x.open('POST', ImageDialog.api_url+'remove');
+        x.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        x.send('image='+image.title);
+
+//            $.post(ImageDialog.api_url+'remove', {image: image.title}, function(data) {
+//                ImageDialog.clearImageInfo();
+//                ImageDialog.resetImageData();
+//                ImageDialog.loadData();
+//                ImageDialog.hideWait();
+//            });
+        }
     },
 
     activateImg: function(image) {
@@ -729,7 +762,16 @@ var ImageDialog = {
         document.getElementById('alt').value = select.options[select.selectedIndex].text;
         document.getElementById('title').value = select.options[select.selectedIndex].text;
         ImageDialog.showPreviewImage(select.options[select.selectedIndex].value);
+    },
+
+    encodeParams: function (params) {
+        var s = ''
+        for (i in params)
+            s+=encodeURIComponent(i)+'='+encodeURIComponent(params[i]);
+        return s
     }
+
+
 
 };
 

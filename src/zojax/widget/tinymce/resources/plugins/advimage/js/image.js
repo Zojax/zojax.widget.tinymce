@@ -139,9 +139,9 @@ var ImageDialog = {
 
     redrawData: function(filter, tab_id) {
         var k = tinyMCEPopup.dom.get(tab_id);
-        var images, prefix;
+        var images;
         images = ImageDialog.images;
-        $(k).html('');
+        k.innerHTML = '';
         for(var i in images) {
             if (isNaN(parseInt(i))) continue;
             var m = images[i];
@@ -165,6 +165,13 @@ var ImageDialog = {
         }
     },
 
+    showWait: function () {
+        tinyMCEPopup.dom.get(this.current_tab+'_images_wait').style.display = 'inline-block';
+    },
+    hideWait: function () {
+        tinyMCEPopup.dom.get(this.current_tab+'_images_wait').style.display = 'none';
+    },
+
     loadData: function(order) {
         if(!order) order = "modified";
 
@@ -176,12 +183,12 @@ var ImageDialog = {
             start: (ImageDialog.page -1) * ImageDialog.pageSize
         };
 
-        $(tinyMCEPopup.dom.get('document_images_wait')).show();
+        ImageDialog.showWait();
         $.post(ImageDialog.api_url+'listing', params, function(data) {
             ImageDialog.images = data.images;
             ImageDialog.formatData(ImageDialog.images);
-            ImageDialog.redrawData('',ImageDialog.current_tab+'_images_content')
-            $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'_images_wait')).hide();
+            ImageDialog.redrawData('',ImageDialog.current_tab+'_images_content');
+            ImageDialog.hideWait();
             ImageDialog.pages_count = Math.ceil(data.total/ImageDialog.pageSize);
             document.getElementById(ImageDialog.current_tab+'_total_pages').innerHTML = ImageDialog.pages_count;
             document.getElementById(ImageDialog.current_tab+'_current_page').value = ImageDialog.page;
@@ -224,7 +231,8 @@ var ImageDialog = {
         x.onreadystatechange = function() {
             if (x.readyState === x.DONE) {
                 var ct = this.getResponseHeader('content-type');
-                if (ct != null && ct.contains('image')) {
+                console.log(ct)
+                if (ct != null && ct.indexOf('image') !== -1) {
                     return callback.apply(ImageDialog, args);
                 } else {
                     tinyMCEPopup.confirm(tinyMCEPopup.getLang('advimage_dlg.incorrect_url'), function(s) {
@@ -590,12 +598,11 @@ var ImageDialog = {
     },
 
     success : function (d) {
-        $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'_images_wait')).hide();
-        d = $(d).text().replace('<pre>', '');
-        d = d.replace('</pre>', '');
-        data = $.parseJSON(d);
+        ImageDialog.hideWait();
+        d = d.replace('<pre>', '').replace('</pre>', '');
+        var data = JSON.parse(d);
         if(!data.success) {
-            $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'z_error')).html(data.error);
+            tinyMCEPopup.dom.get(ImageDialog.current_tab+'z_error').innerHTML = data.error;
             setTimeout(ImageDialog.hideError, 3000);
         } else {
             ImageDialog.loadData();
@@ -603,31 +610,36 @@ var ImageDialog = {
     },
 
     upload: function(form) {
-        var url;
-        $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'_images_wait')).show();
+        this.showWait()
         fileUpload(form, ImageDialog.api_url+'upload', ImageDialog.success);
     },
 
     order: function(sel) {
-        this.loadData($(sel).val());
+        this.loadData(sel.value);
     },
 
     remove: function(image) {
        if(confirm("Delete image "+image.title)) {
-            $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'_images_wait')).show();
+            this.showWait();
+
+
             $.post(ImageDialog.api_url+'remove', {image: image.title}, function(data) {
                 ImageDialog.clearImageInfo();
                 ImageDialog.resetImageData();
                 ImageDialog.loadData();
-                $(tinyMCEPopup.dom.get(ImageDialog.current_tab+'_images_wait')).hide();
+                ImageDialog.hideWait();
             });
        }
     },
 
     activateImg: function(image) {
-        $(tinyMCEPopup.dom.get('my_images_content').children).removeClass('active');
-        $(tinyMCEPopup.dom.get('document_images_content').children).removeClass('active');
-        $(tinyMCEPopup.dom.get('_img'+ image.id)).addClass('active');
+        for (var i=0; i < tinyMCEPopup.dom.get('my_images_content').children.length; i++) {
+            tinyMCEPopup.dom.get('my_images_content').children[i].classList.remove('active');
+        }
+        for (var i=0; i < tinyMCEPopup.dom.get('document_images_content').children.length; i++) {
+            tinyMCEPopup.dom.get('document_images_content').children[i].classList.remove('active');
+        }
+        tinyMCEPopup.dom.get('_img'+ image.id).classList.add('active');
         ImageDialog.current_image =  image;
         ImageDialog.setImageInfo();
     },
@@ -709,6 +721,14 @@ var ImageDialog = {
         if (ImageDialog.page != 1)
             ImageDialog.toPage(1);
         return false;
+    },
+
+
+    selectExternalImage: function (select) {
+        document.getElementById('src').value = select.options[select.selectedIndex].value;
+        document.getElementById('alt').value = select.options[select.selectedIndex].text;
+        document.getElementById('title').value = select.options[select.selectedIndex].text;
+        ImageDialog.showPreviewImage(select.options[select.selectedIndex].value);
     }
 
 };

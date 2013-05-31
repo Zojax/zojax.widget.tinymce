@@ -1,6 +1,6 @@
 var ImageDialog = {
     current_tab: 'my',
-    current_image: null,
+    current_image: {},
     images: {},
     my_images: {},
     document_images: {},
@@ -30,10 +30,10 @@ var ImageDialog = {
 		this.fillFileList('out_list', fl);
 		TinyMCE_EditableSelects.init();
 		if (n.nodeName == 'IMG') {
-            var dimensions = this.dimansionsFromSrc(nl.src.value)
+            var dimensions = this.dimensionsFromSrc(nl.src.value)
 			nl.src.value = dom.getAttrib(n, 'src');
-			nl.width.value = (dimensions != null) && (dimensions.len == 3) ? dimensions[1] : dom.getAttrib(n, 'width');
-			nl.height.value = (dimensions != null) && (dimensions.len == 3) ? dimensions[2] : dom.getAttrib(n, 'height');
+			nl.width.value = (dimensions != null) && (dimensions.length >= 3) ? dimensions[1] : dom.getAttrib(n, 'width');
+			nl.height.value = (dimensions != null) && (dimensions.length >= 3) ? dimensions[2] : dom.getAttrib(n, 'height');
 			nl.alt.value = dom.getAttrib(n, 'alt');
 			nl.title.value = dom.getAttrib(n, 'title');
 			nl.vspace.value = this.getAttrib(n, 'vspace');
@@ -48,6 +48,8 @@ var ImageDialog = {
 			nl.usemap.value = dom.getAttrib(n, 'usemap');
 			nl.longdesc.value = dom.getAttrib(n, 'longdesc');
 			nl.insert.value = ed.getLang('update');
+            ImageDialog.current_image.width = nl.width.value;
+            ImageDialog.current_image.height = nl.height.value;
 
 			if (/^\s*this.src\s*=\s*\'([^\']+)\';?\s*$/.test(dom.getAttrib(n, 'onmouseover')))
 				nl.onmouseoversrc.value = dom.getAttrib(n, 'onmouseover').replace(/^\s*this.src\s*=\s*\'([^\']+)\';?\s*$/, '$1');
@@ -140,8 +142,6 @@ var ImageDialog = {
         var images;
         images = ImageDialog.images;
         tab.innerHTML = '';
-        ImageDialog.clearImageInfo();
-        ImageDialog.resetImageData();
         for(var i in images) {
             if (isNaN(parseInt(i))) continue;
             var m = images[i];
@@ -256,9 +256,8 @@ var ImageDialog = {
 
     insertOriginal: function(){
         var f = document.forms[0], nl = f.elements;
-        nl.width.value = this.preloadImg.width;
-        nl.height.value = this.preloadImg.height;
-//        nl.height.value = ImageDialog.current_image.height;
+        snl.width.value = ImageDialog.current_image.width;
+        nl.height.value = ImageDialog.current_image.height;
         ImageDialog.insert(true);
     },
 
@@ -460,10 +459,9 @@ var ImageDialog = {
 
 	updateImageData : function(img, st) {
 		var f = document.forms[0];
-
 		if (!st) {
-			f.elements.width.value = img.width > ImageDialog.imageMaxWidth ? ImageDialog.imageMaxWidth : img.width;
-			f.elements.height.value = img.height > ImageDialog.imageMaxHeight ? ImageDialog.imageMaxHeight : img.height;
+			f.elements.width.value = img.width == 0 || img.width > ImageDialog.imageMaxWidth ? ImageDialog.imageMaxWidth : img.width;
+			f.elements.height.value = img.height == 0 || ImageDialog.imageMaxHeight ? ImageDialog.imageMaxHeight : img.height;
 		}
 
 		this.preloadImg = img;
@@ -604,16 +602,18 @@ var ImageDialog = {
 			tinyMCEPopup.dom.setHTML('prev', '<img id="previewImg" src="' + u + '" border="0" onload="ImageDialog.updateImageData(this, 1);" />');
     },
 
-    success : function (d) {
+    success: function (d) {
         ImageDialog.hideWait();
-        d = d.replace('<pre>', '').replace('</pre>', '');
-        var data = JSON.parse(d);
-        if(!data.success) {
-            tinyMCEPopup.dom.get(ImageDialog.current_tab+'z_error').innerHTML = data.error;
-            setTimeout(ImageDialog.hideError, 3000);
-        } else {
+
+//        d = d.replace('<pre>', '').replace('</pre>', '');
+//        var data = JSON.parse(d);
+//        if(!data.success) {
+//            tinyMCEPopup.dom.get(ImageDialog.current_tab+'z_error').innerHTML = data.error;
+//            setTimeout(ImageDialog.hideError, 3000);
+//        } else {
+//            ImageDialog.loadData();
+//        }
             ImageDialog.loadData();
-        }
     },
 
     upload: function(form) {
@@ -688,14 +688,14 @@ var ImageDialog = {
         ImageDialog.loadData();
     },
 
-    dimansionsFromSrc: function (src){
-        var regexp = /(\d+)x(\d+)/
-        return regexp.exec(src)
+    dimensionsFromSrc: function (src){
+        var regexp = /(\d+)x(\d+)/;
+        return regexp.exec(src);
     },
 
     isExternalImg: function() {
         var f = document.forms[0], nl = f.elements;
-        return nl.src.value.match(/^http/) != null || this.current_image == null;
+        return nl.src.value.match(/^http/) != null || this.current_image;
     },
 
     nextPage: function () {

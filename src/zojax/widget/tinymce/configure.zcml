@@ -56,4 +56,13 @@
     <resource path="tiny-mce/tiny_mce_popup.js" />
   </zojax:resourcepackage>
 
+  <zojax:resourceinclude
+    name="tiny-mce/jquery.form.js"
+    file="resources/jquery.form.js"
+    require="jquery-plugins"
+    library="jq-ajax-form"
+    type="javascript"
+    mapping=".css:zrt" />
+
+
 </configure>

@@ -96,6 +96,7 @@ class TinyMCETextWidget(TextAreaWidget):
 
     def genScript(self):
         include('tiny-mce')
+        include('jq-ajax-form')
 
         if IAttachmentsAware.providedBy(self.context):
             # handle type error in case context doesn't have parent or name

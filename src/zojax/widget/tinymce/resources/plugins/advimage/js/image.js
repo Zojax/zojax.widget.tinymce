@@ -1,3 +1,4 @@
+$ = tinyMCE.activeEditor.getWin().parent.jQuery;
 var ImageDialog = {
     current_tab: 'my',
     current_image: {},
@@ -29,6 +30,7 @@ var ImageDialog = {
 		this.fillFileList('over_list', fl);
 		this.fillFileList('out_list', fl);
 		TinyMCE_EditableSelects.init();
+
 		if (n.nodeName == 'IMG') {
             var dimensions = this.dimensionsFromSrc(nl.src.value)
 			nl.src.value = dom.getAttrib(n, 'src');
@@ -256,7 +258,7 @@ var ImageDialog = {
 
     insertOriginal: function(){
         var f = document.forms[0], nl = f.elements;
-        snl.width.value = ImageDialog.current_image.width;
+        nl.width.value = ImageDialog.current_image.width;
         nl.height.value = ImageDialog.current_image.height;
         ImageDialog.insert(true);
     },
@@ -752,28 +754,12 @@ var ImageDialog = {
         return s
     }
 
-
-
 };
 
 ImageDialog.preInit();
 tinyMCEPopup.onInit.add(ImageDialog.init, ImageDialog);
 
 function fileUpload(form, action_url, success) {
-
-    var iframe = document.createElement("iframe");
-    var input = document.createElement("input");
-
-    iframe.setAttribute("id", "upload_iframe");
-    iframe.setAttribute("name", "upload_iframe");
-    iframe.setAttribute("width", "0");
-    iframe.setAttribute("height", "0");
-    iframe.setAttribute("border", "0");
-    iframe.setAttribute("style", "width: 0; height: 0; border: none;");
-
-    // Add to document...
-    form.parentNode.appendChild(iframe);
-    form.parentNode.appendChild(iframe);
 
     if (ImageDialog.current_tab == 'my') {
         form.my_img_file.name = 'file';
@@ -783,38 +769,19 @@ function fileUpload(form, action_url, success) {
         form.my_img_file.value = '';
     }
 
-    window.frames['upload_iframe'].name = "upload_iframe";
-
-    iframeId = document.getElementById("upload_iframe");
-
-    var eventHandler = function () {
-
-        if (iframeId.detachEvent) iframeId.detachEvent("onload", eventHandler);
-        else iframeId.removeEventListener("load", eventHandler, false);
-
-        if (iframeId.contentDocument) {
-            content = iframeId.contentDocument.body.innerHTML;
-        } else if (iframeId.contentWindow) {
-            content = iframeId.contentWindow.document.body.innerHTML;
-        } else if (iframeId.document) {
-            content = iframeId.document.body.innerHTML;
-        }
-
-        success(content);
-
-        setTimeout('iframeId.parentNode.removeChild(iframeId)', 250);
-    }
-
-    if (iframeId.addEventListener) iframeId.addEventListener("load", eventHandler, true);
-    if (iframeId.attachEvent) iframeId.attachEvent("onload", eventHandler);
-
-    form.setAttribute("target", "upload_iframe");
-    form.setAttribute("action", action_url);
-    form.setAttribute("method", "post");
     form.setAttribute("enctype", "multipart/form-data");
     form.setAttribute("encoding", "multipart/form-data");
 
-    form.submit();
+    $(form).ajaxSubmit({
+        type: 'post',
+        url: action_url,
+        success: function () {
+//            success(content);
+//            console.log('OK!')
+            ImageDialog.success();
+        }
+    });
+
     if (ImageDialog.current_tab == 'my') {
         form.file.name = 'my_img_file';
     } else {

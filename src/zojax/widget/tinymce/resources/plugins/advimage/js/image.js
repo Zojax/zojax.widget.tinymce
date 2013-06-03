@@ -1,4 +1,3 @@
-$ = tinyMCE.activeEditor.getWin().parent.jQuery;
 var ImageDialog = {
     current_tab: 'my',
     current_image: {},
@@ -619,8 +618,32 @@ var ImageDialog = {
     },
 
     upload: function(form) {
+        var $ = tinyMCE.activeEditor.getWin().parent.jQuery;
         this.showWait()
-        fileUpload(form, ImageDialog.api_url+'upload', ImageDialog.success);
+        if (ImageDialog.current_tab == 'my') {
+            form.my_img_file.name = 'file';
+            form.document_img_file.value = '';
+        } else {
+            form.document_img_file.name = 'file';
+            form.my_img_file.value = '';
+        }
+
+        $(form).ajaxSubmit({
+            type: 'post',
+            url: ImageDialog.api_url+'upload',
+            success: function (data) {
+//                console.log(data);
+                ImageDialog.success();
+            }
+        });
+
+        if (ImageDialog.current_tab == 'my') {
+            form.file.name = 'my_img_file';
+        } else {
+            form.file.name = 'document_img_file';
+        }
+        form.my_img_file.value = '';
+        form.document_img_file.value = '';
     },
 
     order: function(sel) {
@@ -628,22 +651,24 @@ var ImageDialog = {
     },
 
     remove: function(image) {
-        if(confirm("Delete image "+image.title +"?")) {
-            this.showWait();
 
-        var x = new XMLHttpRequest();
-        x.onreadystatechange = function() {
-            if (x.readyState === x.DONE) {
-                ImageDialog.clearImageInfo();
-                ImageDialog.resetImageData();
-                ImageDialog.loadData();
-                ImageDialog.hideWait();
+        tinyMCEPopup.confirm(tinyMCEPopup.getLang('advimage_dlg.remove_img')+image.title +"?", function(s) {
+            if (s){
+                ImageDialog.showWait();
+                var x = new XMLHttpRequest();
+                x.onreadystatechange = function() {
+                    if (x.readyState === x.DONE) {
+                        ImageDialog.clearImageInfo();
+                        ImageDialog.resetImageData();
+                        ImageDialog.loadData();
+                        ImageDialog.hideWait();
+                    }
+                };
+                x.open('POST', ImageDialog.api_url+'remove');
+                x.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+                x.send('image='+image.title);
             }
-        };
-        x.open('POST', ImageDialog.api_url+'remove');
-        x.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-        x.send('image='+image.title);
-        }
+        })
     },
 
     activateImg: function(image) {
@@ -758,35 +783,3 @@ var ImageDialog = {
 
 ImageDialog.preInit();
 tinyMCEPopup.onInit.add(ImageDialog.init, ImageDialog);
-
-function fileUpload(form, action_url, success) {
-
-    if (ImageDialog.current_tab == 'my') {
-        form.my_img_file.name = 'file';
-        form.document_img_file.value = '';
-    } else {
-        form.document_img_file.name = 'file';
-        form.my_img_file.value = '';
-    }
-
-    form.setAttribute("enctype", "multipart/form-data");
-    form.setAttribute("encoding", "multipart/form-data");
-
-    $(form).ajaxSubmit({
-        type: 'post',
-        url: action_url,
-        success: function () {
-//            success(content);
-//            console.log('OK!')
-            ImageDialog.success();
-        }
-    });
-
-    if (ImageDialog.current_tab == 'my') {
-        form.file.name = 'my_img_file';
-    } else {
-        form.file.name = 'document_img_file';
-    }
-    form.my_img_file.value = '';
-    form.document_img_file.value = '';
-}

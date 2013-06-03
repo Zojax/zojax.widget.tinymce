@@ -12,7 +12,7 @@
 </head>
 <body id="advimage" style="display: none" role="application" aria-labelledby="app_title">
 	<span id="app_title" style="display:none">{#advimage_dlg.dialog_title}</span>
-	<form  action="#">
+	<form  action="#" method="post" enctype="multipart/form-data" encoding="multipart/form-data">
 		<div class="tabs">
 			<ul>
 				<li id="my_images_tab" class="current" aria-controls="my_images_panel" onclick="javascript:ImageDialog.changeImageTab('my');"><span><a href="javascript:mcTabs.displayTab('my_images_tab','my_images_panel');" onmousedown="return false;">My images</a></span></li>
@@ -233,7 +233,7 @@
                             Filter:
                         </td>
                         <td>
-                            <input type="text" name="filter" size="20" id="zfilter" onkeyup="ImageDialog.redrawData($(this).val(), 'my_images_content');">
+                            <input type="text" name="filter" size="20" id="zfilter" onkeyup="ImageDialog.redrawData(this.value, 'my_images_content');">
                         </td>
                         <td>
                             Sort By:
@@ -280,7 +280,7 @@
                             Filter:
                         </td>
                         <td>
-                            <input type="text" name="filter" size="20" id="zfilter2" onkeyup="ImageDialog.redrawData($(this).val(), 'document_images_content');">
+                            <input type="text" name="filter" size="20" id="zfilter2" onkeyup="ImageDialog.redrawData(this.value, 'document_images_content');">
                         </td>
                         <td>
                             Sort By:

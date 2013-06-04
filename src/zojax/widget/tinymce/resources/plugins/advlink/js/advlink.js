@@ -1,6 +1,7 @@
 /* Functions for the advlink plugin popup */
 
 tinyMCEPopup.requireLangPack();
+$ = tinyMCE.activeEditor.getWin().parent.jQuery;
 
 var templates = {
 	"window.open" : "window.open('${url}','${target}','${options}')"
@@ -123,6 +124,69 @@ function init() {
 		selectByValue(formObj, 'targetlist', linkTarget, true);
 	} else
 		addClassesToList('classlist', 'advlink_styles');
+
+    console.log(tinyMCE.activeEditor.getParam('contentUrl'))
+
+    getNode()
+}
+
+
+function getNode(node){
+    var root_node = node ? node : 'root';
+    var content_url = tinyMCE.activeEditor.getParam('contentUrl');
+    $.ajax({
+        url: content_url + 'listing',
+        typy: 'get',
+        contentType: 'application/x-www-form-urlencoded',
+        data: {
+            node: root_node
+        },
+        success: function (data){
+            if (data.length == 0){
+                $(document.getElementById(root_node.toString())).siblings('div').addClass('node-empty');
+            }else {
+                for (var i=0, len=data.length; i<len; i++){
+                    addNode(data[i], root_node);
+                }
+            }
+        }
+    });
+}
+
+function chooseLink(href){
+    document.getElementById('href').value = href;
+    return false;
+}
+
+function expandTree(node){
+    var node_ul = document.getElementById(node);
+    $(node_ul).toggle();
+    if ($(node_ul).siblings('div').hasClass('node-collapsed')){
+        $(node_ul).siblings('div').removeClass('node-collapsed');
+        $(node_ul).siblings('div').addClass('node-expanded');
+    } else {
+        $(node_ul).siblings('div').addClass('node-collapsed');
+        $(node_ul).siblings('div').removeClass('node-expanded');
+    }
+
+    if (node_ul.children.length == 0){
+        getNode(node);
+    }
+
+    return false;
+}
+
+function addNode(node, parent_node){
+    var class_type = node.cls == 'folder'?'node-collapsed':'';
+    $(document.getElementById(parent_node.toString())).append('' +
+        '<li class="tree-node">' +
+            '<div class="tree-node-el '+ class_type + '" >' +
+                '<img class="tree-mode" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" onclick="javascript:expandTree('+node.id+')" id="load_'+node.id+'">' +
+                '<img class="node-icon '+ node.cls +'" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" alt="">' +
+                '<a href="'+node.url+'" class="tree-node-anchor" onclick="javascript:chooseLink(this.href); return false;"><span class="node-name">'+node.text+'</span></a>' +
+            '</div>' +
+            '<ul style="display:none;" class="tree-node" id="'+node.id+'"></ul>' +
+        '</li>');
 }
 
 function checkPrefix(n) {

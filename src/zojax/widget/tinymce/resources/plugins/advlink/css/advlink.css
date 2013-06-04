@@ -6,29 +6,11 @@
 #popupwidth, #popupheight, #popupleft, #popuptop {width:30px;vertical-align:middle;text-align:center;}
 #id, #style, #classes, #target, #dir, #hreflang, #lang, #charset, #type, #rel, #rev, #tabindex, #accesskey {width:200px;}
 #events_panel input {width:200px;}
-.tree-node-el img {
-    width: 16px;
-    background-repeat:  no-repeat;
-}
-img.tree-mode{
-    background-image: url('../img/elbow.gif');
-}
-.node-collapsed img.tree-mode {
-    background-image: url('../img/elbow-end-plus.gif');
-}
-.node-expanded img.tree-mode {
-    background-image: url('../img/elbow-end-minus.gif');
-}
-.node-empty img.tree-mode {
-    background-image: url('../img/elbow.gif');
-}
-img.folder {
-    background-image: url('../img/folder.gif');
-}
-img.file {
-    background-image: url('../img/leaf.gif');
-}
-ul.tree-node {
-    list-style: none;
-    padding-left: 20px;
-}
+.tree-node-el img {width: 16px;background-repeat:  no-repeat;}
+img.tree-mode{background-image: url('../img/elbow.gif');}
+.node-collapsed img.tree-mode {background-image: url('../img/elbow-end-plus.gif');}
+.node-expanded img.tree-mode {background-image: url('../img/elbow-end-minus.gif');}
+.node-empty img.tree-mode {background-image: url('../img/elbow.gif');}
+img.folder {background-image: url('../img/folder.gif');}
+img.file {background-image: url('../img/leaf.gif');}
+ul.tree-node {list-style: none;padding-left: 20px;}

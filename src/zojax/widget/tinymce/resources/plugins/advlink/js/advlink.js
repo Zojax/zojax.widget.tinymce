@@ -127,7 +127,6 @@ function init() {
     getNode('root');
 }
 
-
 function getNode(node){
     var root_node = node ? node : 'root';
     var content_url = tinyMCE.activeEditor.getParam('contentUrl');
@@ -143,6 +142,10 @@ function getNode(node){
                 $(document.getElementById(root_node.toString())).siblings('div').addClass('node-empty');
             }else {
                 for (var i=0, len=data.length; i<len; i++){
+                    if (data[i].text=='Members' && len ==1) {
+                        $(document.getElementById(root_node.toString())).siblings('div').addClass('node-empty');
+                        continue;
+                    }
                     addNode(data[i], root_node);
                 }
             }
@@ -152,19 +155,15 @@ function getNode(node){
 
 function chooseLink(a){
     document.getElementById('href').value = $(a).attr('data-content-link');
+    $(document.getElementById('node-tree-wrapper')).find('div.tree-node-el').removeClass('tree-selected')
+    $(a).parent().addClass('tree-selected');
     return false;
 }
 
 function expandTree(node){
     var node_ul = document.getElementById(node);
     $(node_ul).toggle();
-    if ($(node_ul).siblings('div').hasClass('node-collapsed')){
-        $(node_ul).siblings('div').removeClass('node-collapsed');
-        $(node_ul).siblings('div').addClass('node-expanded');
-    } else {
-        $(node_ul).siblings('div').addClass('node-collapsed');
-        $(node_ul).siblings('div').removeClass('node-expanded');
-    }
+    $(node_ul).siblings('div').toggleClass('node-collapsed');
     if ((node_ul.children.length == 0) && !$(node_ul).siblings('div').hasClass('node-empty')){
         getNode(node);
     }
@@ -172,7 +171,7 @@ function expandTree(node){
 }
 
 function addNode(node, parent_node){
-    var class_type = node.cls == 'folder'?'node-collapsed':'';
+    var class_type = node.cls == 'folder'?'node-collapsed':'node-empty';
     $(document.getElementById(parent_node.toString())).append('' +
         '<li class="tree-node">' +
             '<div class="tree-node-el '+ class_type + '" >' +

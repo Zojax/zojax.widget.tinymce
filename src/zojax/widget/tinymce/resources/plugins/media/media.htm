@@ -14,14 +14,23 @@
 <form onsubmit="Media.insert();return false;" action="#">
 		<div class="tabs" role="presentation">
 			<ul>
-				<li id="general_tab" class="current" aria-controls="general_panel"><span><a href="javascript:mcTabs.displayTab('general_tab','general_panel');Media.formToData();" onmousedown="return false;">{#media_dlg.general}</a></span></li>
+				<li id="youtube_tab" class="current" aria-controls="youtube_panel"><span><a href="javascript:mcTabs.displayTab('youtube_tab','youtube_panel');Media.formToData();" onmousedown="return false;">Youtube media</a></span></li>
+				<li id="general_tab" aria-controls="general_panel"><span><a href="javascript:mcTabs.displayTab('general_tab','general_panel');Media.formToData();" onmousedown="return false;">{#media_dlg.general}</a></span></li>
 				<li id="advanced_tab" aria-controls="advanced_panel"><span><a href="javascript:mcTabs.displayTab('advanced_tab','advanced_panel');Media.formToData();" onmousedown="return false;">{#media_dlg.advanced}</a></span></li>
 				<li id="source_tab" aria-controls="source_panel"><span><a href="javascript:mcTabs.displayTab('source_tab','source_panel');Media.formToData('source');" onmousedown="return false;">{#media_dlg.source}</a></span></li>
 			</ul>
 		</div>
 
 		<div class="panel_wrapper">
-			<div id="general_panel" class="panel current">
+ 			<div id="youtube_panel" class="panel current">
+				<fieldset>
+					<legend>Youtybe media</legend>
+
+                    <div id="youtube_media_container"></div>
+
+				</fieldset>
+			</div>
+            <div id="general_panel" class="panel">
 				<fieldset>
 					<legend>{#media_dlg.general}</legend>
 

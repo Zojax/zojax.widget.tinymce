@@ -1,5 +1,6 @@
 (function() {
 	var url;
+    var $ = tinyMCE.activeEditor.getWin().parent.jQuery;
 
 	if (url = tinyMCEPopup.getParam("media_external_list_url"))
 		document.write('<script language="javascript" type="text/javascript" src="' + tinyMCEPopup.editor.documentBaseURI.toAbsolute(url) + '"></script>');
@@ -112,15 +113,75 @@
 			self.preview();
 
 			updateColor('bgcolor_pick', 'bgcolor');
+            self.loadYoutubeMedia();
 		},
+
+        loadYoutubeMedia : function () {
+            var youtubeAPI = "https://gdata.youtube.com/feeds/api/videos?v=2";
+            $.ajax({
+                url: youtubeAPI,
+
+                data: {
+                    alt: 'jsonc',
+                    "max-results": '30'
+//                        q: 'filter'
+                },
+                success: function( data ) {
+                    console.log(data)
+                    var container = document.getElementById('youtube_media_container');
+                    window.Media.data = data.data.items;
+                    $.each( data.data.items, function( i, item ) {
+                        var content = '';
+                        for (var key in item.content){content = item.content[key]; break;}
+//                        console.log(item)
+                        $(container).append('' +
+                            '<div onclick="javascript:window.Media.select(this);" data-content-url="'+content+'" data-index="'+i+'">' +
+                                '<div class="wraper" id="'+item.id+'">' +
+                                    '<img src="'+item.thumbnail.sqDefault+'">' +
+                                    '<span>'+item.title+'</span>' +
+                                '</div>' +
+                            '</div>');
+                    });
+                }
+            });
+        },
+
+        select: function(div){
+            $(div).toggleClass('selected');
+            document.getElementById('src').value = $(div).attr('data-content-url')
+            window.Media.current_video = window.Media.data[$(div).attr('data-index')]
+        },
 
 		insert : function() {
 			var editor = tinyMCEPopup.editor;
+            if (window.Media.current_video){
+                editor.execCommand('mceRepaint');
+                var media_id = window.Media.current_video.id;
+                var html = '' +
+                    '<div>'+
+                        '<div class="inline-thumb-wrap">'+
+                            '<div class="thumb">'+
+                                '<a href="'+media_id+'" class="z-media {width: \'600\', ' +
+                                                                        'height: \'400\', ' +
+                                                                        'type: \'youtube\', ' +
+                                                                        'preview: \'http://img.youtube.com/vi/'+media_id+'/default.jpg\', ' +
+                                                                        'autoplay: true, params:{allowfullscreen: true}, ' +
+                                                                        'flashvars: {type: \'youtube\', ' +
+                                                                                    'config: {\'clip\': {\'url\':\''+media_id+'\', \'autoPlay\': true, \'autoBuffering\': true } }, autostart: \'true\'}}">'+
+                                    '<img alt="MACKLEMORE &amp; RYAN LEWIS - THRIFT SHOP FEAT. WANZ (OFFICIAL VIDEO)" src="http://img.youtube.com/vi/'+media_id+'/default.jpg">'+
+                                '</a>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+
+                    '<br>'
+                editor.execCommand('mceInsertContent', false, html);
+            } else {
+                this.formToData();
+                editor.execCommand('mceRepaint');
+                tinyMCEPopup.restoreSelection();
+                editor.selection.setNode(editor.plugins.media.dataToImg(this.data));
+            }
 
-			this.formToData();
-			editor.execCommand('mceRepaint');
-			tinyMCEPopup.restoreSelection();
-			editor.selection.setNode(editor.plugins.media.dataToImg(this.data));
 			tinyMCEPopup.close();
 		},
 

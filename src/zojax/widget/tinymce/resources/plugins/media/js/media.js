@@ -156,19 +156,29 @@
 			var editor = tinyMCEPopup.editor;
             if (window.Media.current_video){
                 editor.execCommand('mceRepaint');
-                var media_id = window.Media.current_video.id;
+                var video = window.Media.current_video;
+                var config = {
+                    url: video.id,
+                    preview: "http://img.youtube.com/vi/"+video.id+"/default.jpg",
+                    autoplay: $(document.getElementById('flash_play')).is(':checked'),
+                    title: video.title
+                }
                 var html = '' +
                     '<div>'+
                         '<div class="inline-thumb-wrap">'+
                             '<div class="thumb">'+
-                                '<a href="'+media_id+'" class="z-media {width: \'600\', ' +
+                                '<a href="'+config.url+'" class="z-media {width: \'600\', ' +
                                                                         'height: \'400\', ' +
                                                                         'type: \'youtube\', ' +
-                                                                        'preview: \'http://img.youtube.com/vi/'+media_id+'/default.jpg\', ' +
-                                                                        'autoplay: true, params:{allowfullscreen: true}, ' +
+                                                                        'preview: \''+ config.preview+ '\', ' +
+                                                                        'autoplay: '+ config.autoplay+ ', ' +
+                                                                        'params:{allowfullscreen: true}, ' +
                                                                         'flashvars: {type: \'youtube\', ' +
-                                                                                    'config: {\'clip\': {\'url\':\''+media_id+'\', \'autoPlay\': true, \'autoBuffering\': true } }, autostart: \'true\'}}">'+
-                                    '<img alt="MACKLEMORE &amp; RYAN LEWIS - THRIFT SHOP FEAT. WANZ (OFFICIAL VIDEO)" src="http://img.youtube.com/vi/'+media_id+'/default.jpg">'+
+                                                                                    'config: {\'clip\': {\'url\':\''+config.url+'\', ' +
+                                                                                                        '\'autoPlay\': '+config.autoplay+', ' +
+                                                                                                        '\'autoBuffering\': true } }, ' +
+                                                                                    'autostart: \''+config.autoplay+'\'}}">'+
+                                    '<img alt="'+config.title+'" src="'+ config.preview+ '">'+
                                 '</a>'+
                             '</div>'+
                         '</div>'+

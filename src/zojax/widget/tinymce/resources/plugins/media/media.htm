@@ -15,6 +15,7 @@
 		<div class="tabs" role="presentation">
 			<ul>
 				<li id="youtube_tab" class="current" aria-controls="youtube_panel"><span><a href="javascript:mcTabs.displayTab('youtube_tab','youtube_panel');Media.formToData();" onmousedown="return false;">Youtube media</a></span></li>
+				<li id="wistia_tab" aria-controls="wistia_panel"><span><a href="javascript:mcTabs.displayTab('wistia_tab','wistia_panel');Media.formToData();" onmousedown="return false;">Wistia media</a></span></li>
 				<li id="general_tab" aria-controls="general_panel"><span><a href="javascript:mcTabs.displayTab('general_tab','general_panel');Media.formToData();" onmousedown="return false;">{#media_dlg.general}</a></span></li>
 				<li id="advanced_tab" aria-controls="advanced_panel"><span><a href="javascript:mcTabs.displayTab('advanced_tab','advanced_panel');Media.formToData();" onmousedown="return false;">{#media_dlg.advanced}</a></span></li>
 				<li id="source_tab" aria-controls="source_panel"><span><a href="javascript:mcTabs.displayTab('source_tab','source_panel');Media.formToData('source');" onmousedown="return false;">{#media_dlg.source}</a></span></li>
@@ -26,7 +27,15 @@
 				<fieldset>
 					<legend>Youtybe media</legend>
 
-                    <div id="youtube_media_container"></div>
+                    <div id="youtube_media_container" class="media_container youtube_media_container"></div>
+
+				</fieldset>
+			</div>
+ 			<div id="wistia_panel" class="panel">
+				<fieldset>
+					<legend>Wistia media</legend>
+
+                    <div id="wistia_media_container" class="media_container wistia_media_container"></div>
 
 				</fieldset>
 			</div>

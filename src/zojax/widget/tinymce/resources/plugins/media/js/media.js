@@ -114,6 +114,7 @@
 
 			updateColor('bgcolor_pick', 'bgcolor');
             self.loadYoutubeMedia();
+            self.loadWistiaMedia();
 		},
 
         loadYoutubeMedia : function () {
@@ -129,13 +130,11 @@
                 success: function( data ) {
                     console.log(data)
                     var container = document.getElementById('youtube_media_container');
-                    window.Media.data = data.data.items;
+                    window.Media.youtube_data = data.data.items;
                     $.each( data.data.items, function( i, item ) {
-                        var content = '';
                         for (var key in item.content){content = item.content[key]; break;}
-//                        console.log(item)
                         $(container).append('' +
-                            '<div onclick="javascript:window.Media.select(this);" data-content-url="'+content+'" data-index="'+i+'">' +
+                            '<div onclick="javascript:window.Media.select(this);" class="img-container" data-content-url="'+content+'" data-index="'+i+'" data-source="youtube">' +
                                 '<div class="wraper" id="'+item.id+'">' +
                                     '<img src="'+item.thumbnail.sqDefault+'">' +
                                     '<span>'+item.title+'</span>' +
@@ -146,45 +145,122 @@
             });
         },
 
+        loadWistiaMedia : function () {
+            var wistiaAPI = "/WistiaJsAPI/";
+            $.ajax({
+                url: wistiaAPI,
+                data: {
+                    alt: 'jsonc',
+                    "limit": '30',
+                    "start": '0'
+//                        q: 'filter'
+                },
+                success: function( data ) {
+                    console.log(data)
+                    var container = document.getElementById('wistia_media_container');
+                    window.Media.wistia_data = data;
+                    window.Media.data_source = 'wistia';
+                    $.each( data, function( i, item ) {
+                        $(container).append('' +
+                            '<div onclick="javascript:window.Media.select(this);" class="img-container" data-index="'+i+'" data-source="wistia">' +
+                                '<div class="wraper" id="'+item.id+'">' +
+                                    '<img src="'+item.thumbnail.url+'">' +
+                                    '<span>'+item.name+'</span>' +
+                                '</div>' +
+                            '</div>');
+                    });
+                }
+            });
+        },
+
         select: function(div){
-            $(div).toggleClass('selected');
-            document.getElementById('src').value = $(div).attr('data-content-url')
-            window.Media.current_video = window.Media.data[$(div).attr('data-index')]
+            $(document.getElementsByClassName('img-container')).removeClass('selected');
+            $(div).addClass('selected');
+//            document.getElementById('src').value = $(div).attr('data-content-url');
+            window.Media.data_source = $(div).attr('data-source');
+//            window.Media[window.Media.data_source+'_data']
+            window.Media.current_video = window.Media[window.Media.data_source+'_data'][$(div).attr('data-index')]
         },
 
 		insert : function() {
 			var editor = tinyMCEPopup.editor;
             if (window.Media.current_video){
-                editor.execCommand('mceRepaint');
-                var video = window.Media.current_video;
-                var config = {
-                    url: video.id,
-                    preview: "http://img.youtube.com/vi/"+video.id+"/default.jpg",
-                    autoplay: $(document.getElementById('flash_play')).is(':checked'),
-                    title: video.title
-                }
-                var html = '' +
-                    '<div>'+
-                        '<div class="inline-thumb-wrap">'+
+                switch (window.Media.data_source) {
+                    case 'wistia':
+                        var video = window.Media.current_video;
+                        var config = {
+                            url: video.assets[1].url,
+                            stil_url: video.assets[3].url,
+                            preview: video.thumbnail.url,
+                            autoplay: $(document.getElementById('flash_play')).is(':checked'),
+                            title: video.name,
+                            duration: video.duration
+                        }
+                        html = '' +
+                        '<div>' +
+                            '<div class="inline-thumb-wrap">' +
+                                '<div class="thumb">' +
+                                    '<a href="'+config.url+'" class="z-media {' +
+                                                                    'width: \'640\','+
+                                                                    'height: \'480\','+
+                                                                    'type: \'wistia.video\','+
+                                                                    'preview: \''+ config.preview+ '\','+
+                                                                    'autoplay: true,'+
+                                                                    'params: {allowfullscreen: true}, ' +
+                                                                    'flashvars:{'+
+                                                                        'autoPlay: \'true\', '+
+                                                                        'stillUrl: \''+config.stil_url+'\', '+
+                                                                        'accountKey: \'wistia-production_12853\', '+
+                                                                        'mediaID: \'wistia-production_977641\', '+
+                                                                        'embedServiceURL: \'http://distillery.wistia.com/x\', '+
+                                                                        'mediaDuration: \''+config.duration+'\''+
+                                                                    '} '+
+                                                                '}">' +
+                                        '<img alt="'+config.title+'" src="'+ config.preview+ '">' +
+                                    '</a>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<br>'
+                        break;
+
+                    case 'youtube':
+                        var video = window.Media.current_video;
+                        var config = {
+                            url: video.id,
+                            preview: "http://img.youtube.com/vi/"+video.id+"/default.jpg",
+                            autoplay: $(document.getElementById('flash_play')).is(':checked'),
+                            title: video.title
+                        }
+                        var html = '' +
+                            '<div>'+
+                            '<div class="inline-thumb-wrap">'+
                             '<div class="thumb">'+
-                                '<a href="'+config.url+'" class="z-media {width: \'600\', ' +
-                                                                        'height: \'400\', ' +
-                                                                        'type: \'youtube\', ' +
-                                                                        'preview: \''+ config.preview+ '\', ' +
-                                                                        'autoplay: '+ config.autoplay+ ', ' +
-                                                                        'params:{allowfullscreen: true}, ' +
-                                                                        'flashvars: {type: \'youtube\', ' +
-                                                                                    'config: {\'clip\': {\'url\':\''+config.url+'\', ' +
-                                                                                                        '\'autoPlay\': '+config.autoplay+', ' +
-                                                                                                        '\'autoBuffering\': true } }, ' +
-                                                                                    'autostart: \''+config.autoplay+'\'}}">'+
-                                    '<img alt="'+config.title+'" src="'+ config.preview+ '">'+
-                                '</a>'+
+                            '<a href="'+config.url+'" class="z-media {width: \'600\', ' +
+                            'height: \'400\', ' +
+                            'type: \'youtube\', ' +
+                            'preview: \''+ config.preview+ '\', ' +
+                            'autoplay: '+ config.autoplay+ ', ' +
+                            'params:{allowfullscreen: true}, ' +
+                            'flashvars: {type: \'youtube\', ' +
+                            'config: {\'clip\': {\'url\':\''+config.url+'\', ' +
+                            '\'autoPlay\': '+config.autoplay+', ' +
+                            '\'autoBuffering\': true } }, ' +
+                            'autostart: \''+config.autoplay+'\'}}">'+
+                            '<img alt="'+config.title+'" src="'+ config.preview+ '">'+
+                            '</a>'+
                             '</div>'+
-                        '</div>'+
-                    '</div>'+
-                    '<br>'
+                            '</div>'+
+                            '</div>'+
+                            '<br>'
+                        break;
+
+                }
+                editor.execCommand('mceRepaint');
                 editor.execCommand('mceInsertContent', false, html);
+
+
+
             } else {
                 this.formToData();
                 editor.execCommand('mceRepaint');

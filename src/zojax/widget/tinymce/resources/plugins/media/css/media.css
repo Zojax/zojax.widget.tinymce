@@ -15,25 +15,30 @@
 #shockwave_swvolume, #shockwave_swframe, #shockwave_swurl, #shockwave_swstretchvalign, #shockwave_swstretchhalign, #shockwave_swstretchstyle { width: 90px }
 #qt_qtsrc { width: 200px }
 iframe {border: 1px solid gray}
-div#youtube_media_container div {
+div.media_container div {
     float: left;
     margin: 4px 4px 4px 4px;
     padding: 5px;
 }
-div#youtube_media_container div.selected {
+div.media_container div.selected {
     background: none repeat scroll 0 0 #36C6DD;
 }
-div#youtube_media_container img {
-    height: 80px;
+div.media_container img {
     top: 5px;
 }
-div#youtube_media_container span {
+div.media_container.youtube_media_container img {
+    height: 80px;
+}
+div.media_container.wistia_media_container img {
+    height: 65px;
+}
+div.media_container span {
     display: block;
     overflow: hidden;
     text-align: center;
     height: 15px;
 }
-div#youtube_media_container div.wraper {
+div.media_container div.wraper {
     background: none repeat scroll 0 0 white;
     border: 1px solid #DDDDDD;
     height: 90px;

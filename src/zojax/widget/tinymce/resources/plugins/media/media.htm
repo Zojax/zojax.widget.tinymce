@@ -14,7 +14,9 @@
 <form onsubmit="Media.insert();return false;" action="#">
 		<div class="tabs" role="presentation">
 			<ul>
-				<li id="youtube_tab" class="current" aria-controls="youtube_panel"><span><a href="javascript:mcTabs.displayTab('youtube_tab','youtube_panel');Media.formToData();" onmousedown="return false;">Youtube media</a></span></li>
+				<li id="my_media_tab" class="current" aria-controls="my_media_panel" onclick="javascript:window.Media.changeImageTab('my');"><span><a href="javascript:mcTabs.displayTab('my_media_tab','my_media_panel');Media.formToData();" onmousedown="return false;">My media media</a></span></li>
+				<li id="document_media_tab" aria-controls="document_media_panel" onclick="javascript:window.Media.changeImageTab('document');"><span><a href="javascript:mcTabs.displayTab('document_media_tab','document_media_panel');Media.formToData();" onmousedown="return false;">Document media media</a></span></li>
+				<li id="youtube_tab" aria-controls="youtube_panel"><span><a href="javascript:mcTabs.displayTab('youtube_tab','youtube_panel');Media.formToData();" onmousedown="return false;">Youtube media</a></span></li>
 				<li id="wistia_tab" aria-controls="wistia_panel"><span><a href="javascript:mcTabs.displayTab('wistia_tab','wistia_panel');Media.formToData();" onmousedown="return false;">Wistia media</a></span></li>
 				<li id="general_tab" aria-controls="general_panel"><span><a href="javascript:mcTabs.displayTab('general_tab','general_panel');Media.formToData();" onmousedown="return false;">{#media_dlg.general}</a></span></li>
 				<li id="advanced_tab" aria-controls="advanced_panel"><span><a href="javascript:mcTabs.displayTab('advanced_tab','advanced_panel');Media.formToData();" onmousedown="return false;">{#media_dlg.advanced}</a></span></li>
@@ -23,7 +25,152 @@
 		</div>
 
 		<div class="panel_wrapper">
- 			<div id="youtube_panel" class="panel current">
+			<div id="my_media_panel" class="panel current">
+				<fieldset>
+					<legend>My media</legend>
+                <table style="border:0">
+                    <tr>
+                        <td>
+                            Filter:
+                        </td>
+                        <td>
+                            <input type="text" name="filter" size="20" id="zfilter1" onkeyup="ImageDialog.redrawData(this.value, 'my_media_content');">
+                        </td>
+                        <td>
+                            Sort By:
+                        </td>
+                        <!--<td>-->
+                            <!--<select onchange="ImageDialog.order(this);">-->
+                                <!--<option value="title" selected>Name</option>-->
+                                <!--<option value="size" selected>File Size</option>-->
+                                <!--<option value="modified" selected="selected">Last Modified</option>-->
+                            <!--</select>-->
+                        <!--</td>-->
+                        <td>
+                            <div id="up_container1">
+                                <input type="file" name="my_img_file" size="40" id="zfileup1" onchange="window.Media.upload(this.form);">
+                            </div>
+                        </td>
+                        <td>
+                            <input type="button" value="Upload" onclick="document.getElementById('zfileup1').click();">
+                        </td>
+                        <td>
+                            <span id="z_error1" style="color:red; margin-left: 20px"></span>
+                        </td>
+                        <td>
+                            <img src="img/wait.gif" style="display: none;" id="my_media_wait"/>
+                        </td>
+                    </tr>
+                </table>
+                    <div id="my_media_container" class="media_container my_media_container"></div>
+				</fieldset>
+
+                <!--<div class="z_media_container">-->
+                    <!--<div id="my_media_content"></div>-->
+                    <!--<div id='upload1'></div>-->
+                <!--</div>-->
+                <!--<div class="paginator" style="display: none" id="my_paginator">-->
+                    <!--<a href="javascript:void(0)" onclick="javascript:ImageDialog.firstPage();">&lt;&lt;</a>-->
+                    <!--<a href="javascript:void(0)" onclick="javascript:ImageDialog.prevPage();">&lt;</a>-->
+                    <!--<input id="my_current_page" type="text" value="1" name="page" onchange="javascript:ImageDialog.toPage(this.value)"/> of <span id="my_total_pages">1</span>-->
+                    <!--<a href="javascript:void(0)" onclick="javascript:ImageDialog.nextPage();">&gt;</a>-->
+                    <!--<a href="javascript:void(0)" onclick="javascript:ImageDialog.lastPage();">&gt;&gt;</a>-->
+                <!--</div>-->
+			<!--</div>-->
+            <!--<div id="document_media_panel" class="panel">-->
+                <!--<table style="border:0">-->
+                    <!--<tr>-->
+                        <!--<td>-->
+                            <!--Filter:-->
+                        <!--</td>-->
+                        <!--<td>-->
+                            <!--<input type="text" name="filter" size="20" id="zfilter2" onkeyup="ImageDialog.redrawData(this.value, 'document_media_content');">-->
+                        <!--</td>-->
+                        <!--<td>-->
+                            <!--Sort By:-->
+                        <!--</td>-->
+                        <!--<td>-->
+                            <!--<select onchange="ImageDialog.order(this);">-->
+                                <!--<option value="title" selected>Name</option>-->
+                                <!--<option value="size" selected>File Size</option>-->
+                                <!--<option value="modified" selected="selected">Last Modified</option>-->
+                            <!--</select>-->
+                        <!--</td>-->
+                        <!--<td>-->
+                            <!--<div id="up_container2">-->
+                                <!--<input type="file" name="document_img_file" size="40" id="zfileup2" onchange="ImageDialog.upload(this.form);">-->
+                            <!--</div>-->
+                        <!--</td>-->
+                        <!--<td>-->
+                            <!--<input type="button" value="Upload" onclick="document.getElementById('zfileup2').click();">-->
+                        <!--</td>-->
+                        <!--<td>-->
+                            <!--<span id="z_error2" style="color:red; margin-left: 20px"></span>-->
+                        <!--</td>-->
+                        <!--<td>-->
+                            <!--<img src="img/wait.gif" style="display: none;" id="document_media_wait"/>-->
+                        <!--</td>-->
+                    <!--</tr>-->
+                <!--</table>-->
+                <!--<div class="z_media_container">-->
+
+                    <!--<div id="document_media_content"></div>-->
+
+                    <!--<div id='upload2'></div>-->
+                <!--</div>-->
+                <!--<div class="paginator" style="display: none" id="document_paginator">-->
+                    <!--<a href="javascript:void(0)" onclick="javascript:ImageDialog.firstPage();">&lt;&lt;</a>-->
+                    <!--<a href="javascript:void(0)" onclick="javascript:ImageDialog.prevPage();">&lt;</a>-->
+                    <!--<input id="document_current_page" type="text" value="1" name="page" onchange="javascript:ImageDialog.toPage(this.value)"/> of <span id="document_total_pages">1</span>-->
+                    <!--<a href="javascript:void(0)" onclick="javascript:ImageDialog.nextPage();">&gt;</a>-->
+                    <!--<a href="javascript:void(0)" onclick="javascript:ImageDialog.lastPage();">&gt;&gt;</a>-->
+                <!--</div>-->
+
+			</div>
+
+            <div id="document_media_panel" class="panel">
+				<fieldset>
+					<legend>Document media</legend>
+                    <table style="border:0">
+                        <tr>
+                            <td>
+                                Filter:
+                            </td>
+                            <td>
+                                <input type="text" name="filter" size="20" id="zfilter" onkeyup="ImageDialog.redrawData(this.value, 'my_media_content');">
+                            </td>
+                            <td>
+                                Sort By:
+                            </td>
+                            <!--<td>-->
+                                <!--<select onchange="ImageDialog.order(this);">-->
+                                    <!--<option value="title" selected>Name</option>-->
+                                    <!--<option value="size" selected>File Size</option>-->
+                                    <!--<option value="modified" selected="selected">Last Modified</option>-->
+                                <!--</select>-->
+                            <!--</td>-->
+                            <td>
+                                <div id="up_container">
+                                    <input type="file" name="document_img_file" size="40" id="zfileup2" onchange="window.Media.upload(this.form);">
+                                </div>
+                            </td>
+                            <td>
+                                <input type="button" value="Upload" onclick="document.getElementById('zfileup2').click();">
+                            </td>
+                            <td>
+                                <span id="z_error2" style="color:red; margin-left: 20px"></span>
+                            </td>
+                            <td>
+                                <img src="img/wait.gif" style="display: none;" id="document_media_wait"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <div id="document_media_container" class="media_container document_media_container"></div>
+				</fieldset>
+            </div>
+
+
+ 			<div id="youtube_panel" class="panel">
 				<fieldset>
 					<legend>Youtybe media</legend>
 
@@ -929,6 +1076,10 @@
 					<textarea id="source" style="width: 99%; height: 390px"></textarea>
 				</fieldset>
 			</div>
+        
+        
+        
+        
 		</div>
 
 		<div class="mceActionPanel">

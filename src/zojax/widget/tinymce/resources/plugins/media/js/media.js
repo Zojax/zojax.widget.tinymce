@@ -66,6 +66,9 @@
 	}
 
 	window.Media = {
+        api_url: tinyMCE.activeEditor.getParam('mediaUrl2'),
+        current_tab: 'my',
+
 		init : function() {
 			var html, editor, self = this;
 
@@ -113,6 +116,8 @@
 			self.preview();
 
 			updateColor('bgcolor_pick', 'bgcolor');
+            self.loadMyMedia();
+            self.loadDocumentMedia();
             self.loadYoutubeMedia();
             self.loadWistiaMedia();
 		},
@@ -156,10 +161,8 @@
 //                        q: 'filter'
                 },
                 success: function( data ) {
-                    console.log(data)
                     var container = document.getElementById('wistia_media_container');
                     window.Media.wistia_data = data;
-                    window.Media.data_source = 'wistia';
                     $.each( data, function( i, item ) {
                         $(container).append('' +
                             '<div onclick="javascript:window.Media.select(this);" class="img-container" data-index="'+i+'" data-source="wistia">' +
@@ -172,13 +175,108 @@
                 }
             });
         },
+        loadMyMedia : function () {
+            var urlAPI = tinyMCE.activeEditor.getParam('mediaUrl2');
+            $.ajax({
+                url: urlAPI + '/listing/',
+                type: "post",
+                data: {
+                    limit: "30",
+                    ph:	"80",
+                    pw:	"80",
+                    "start": '0'
+//                        q: 'filter'
+                },
+                success: function( data ) {
+                    var container = document.getElementById('my_media_container');
+                    window.Media.my_media_data = data.medias;
+                    $(container).html('');
+                    $.each( data.medias, function( i, item ) {
+                        $(container).append('' +
+                            '<div onclick="javascript:window.Media.select(this);" class="img-container" data-index="'+i+'" data-source="my_media">' +
+                                '<div class="wraper" id="'+item.id+'">' +
+                                    '<img src="'+item.preview+'">' +
+                                    '<span>'+item.name+'</span>' +
+                                '</div>' +
+                            '</div>');
+                    });
+                }
+            });
+        },
+        loadDocumentMedia : function () {
+            var urlAPI = tinyMCE.activeEditor.getParam('mediaUrl1');
+            $.ajax({
+                url: urlAPI + '/listing/',
+                type: "post",
+                data: {
+                    limit: "30",
+                    ph:	"80",
+                    pw:	"80",
+                    "start": '0'
+                },
+                success: function( data ) {
+                    var container = document.getElementById('document_media_container');
+                    window.Media.my_media_data = data.medias;
+                    $(container).html('');
+                    $.each( data.medias, function( i, item ) {
+                        $(container).append('' +
+                            '<div onclick="javascript:window.Media.select(this);" class="img-container" data-index="'+i+'" data-source="document_media">' +
+                                '<div class="wraper" id="'+item.id+'">' +
+                                    '<img src="'+item.preview+'">' +
+                                    '<span>'+item.name+'</span>' +
+                                '</div>' +
+                            '</div>');
+                    });
+                }
+            });
+        },
+
+        changeImageTab: function (tab) {
+            window.Media.current_tab = tab;
+            if (tab == 'document') {
+                window.Media.api_url = tinyMCE.activeEditor.getParam('mediaUrl1');
+            } else {
+                window.Media.api_url = tinyMCE.activeEditor.getParam('mediaUrl2');
+            }
+            window.Media.page = 1;
+//            window.Media.loadData();
+        },
+
+        upload: function(form) {
+            var $ = tinyMCE.activeEditor.getWin().parent.jQuery;
+//            this.showWait()
+            console.log('TAB', window.Media.current_tab);
+            if (window.Media.current_tab == 'my') {
+                form.my_img_file.name = 'image';
+                form.document_img_file.value = '';
+            } else {
+                form.document_img_file.name = 'image';
+                form.my_img_file.value = '';
+            }
+
+            $(form).ajaxSubmit({
+                type: 'post',
+                url: window.Media.api_url+'upload',
+                success: function (data) {
+//                    ImageDialog.success();
+                    window.Media.loadMyMedia();
+                    window.Media.loadDocumentMedia();
+                }
+            });
+
+            if (window.Media.current_tab == 'my') {
+                form.image.name = 'my_img_file';
+            } else {
+                form.image.name = 'document_img_file';
+            }
+            form.my_img_file.value = '';
+            form.document_img_file.value = '';
+        },
 
         select: function(div){
             $(document.getElementsByClassName('img-container')).removeClass('selected');
             $(div).addClass('selected');
-//            document.getElementById('src').value = $(div).attr('data-content-url');
             window.Media.data_source = $(div).attr('data-source');
-//            window.Media[window.Media.data_source+'_data']
             window.Media.current_video = window.Media[window.Media.data_source+'_data'][$(div).attr('data-index')]
         },
 

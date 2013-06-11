@@ -242,35 +242,26 @@
 //            window.Media.loadData();
         },
 
-        upload: function(form) {
-            var $ = tinyMCE.activeEditor.getWin().parent.jQuery;
-//            this.showWait()
-            console.log('TAB', window.Media.current_tab);
-            if (window.Media.current_tab == 'my') {
-                form.my_img_file.name = 'image';
-                form.document_img_file.value = '';
-            } else {
-                form.document_img_file.name = 'image';
-                form.my_img_file.value = '';
-            }
+        reloadLocalMediaTabs: function(){
+            window.Media.loadMyMedia();
+            window.Media.loadDocumentMedia();
+        },
 
-            $(form).ajaxSubmit({
-                type: 'post',
-                url: window.Media.api_url+'upload',
-                success: function (data) {
-//                    ImageDialog.success();
-                    window.Media.loadMyMedia();
-                    window.Media.loadDocumentMedia();
+        upload: function() {
+            var p_url = tinyMCEPopup.getWindowArg('plugin_url');
+            tinyMCE.activeEditor.windowManager.open({
+                title: 'Upload media',
+                file: p_url+'/add_metadata.htm',
+                width : 320,
+                height : 240,
+                inline : 1
+            },{
+                api_url: window.Media.api_url,
+                callback: function (data) {
+                    window.Media.reloadLocalMediaTabs();
                 }
             });
 
-            if (window.Media.current_tab == 'my') {
-                form.image.name = 'my_img_file';
-            } else {
-                form.image.name = 'document_img_file';
-            }
-            form.my_img_file.value = '';
-            form.document_img_file.value = '';
         },
 
         select: function(div){
@@ -284,6 +275,44 @@
 			var editor = tinyMCEPopup.editor;
             if (window.Media.current_video){
                 switch (window.Media.data_source) {
+                    case 'my_media':
+                    case 'document_media':
+                        var video = window.Media.current_video;
+                        var config = {
+                            url: video.assets[1].url,
+                            stil_url: video.assets[3].url,
+                            preview: video.thumbnail.url,
+                            autoplay: $(document.getElementById('flash_play')).is(':checked'),
+                            title: video.name,
+                            duration: video.duration
+                        }
+                        html = '' +
+                        '<div>' +
+                            '<div class="inline-thumb-wrap">' +
+                                '<div class="thumb">' +
+                                    '<a href="'+config.url+'" class="z-media {' +
+                                                                    'width: \'640\','+
+                                                                    'height: \'480\','+
+                                                                    'type: \'wistia.video\','+
+                                                                    'preview: \''+ config.preview+ '\','+
+                                                                    'autoplay: true,'+
+                                                                    'params: {allowfullscreen: true}, ' +
+                                                                    'flashvars:{'+
+                                                                        'autoPlay: \'true\', '+
+                                                                        'stillUrl: \''+config.stil_url+'\', '+
+                                                                        'accountKey: \'wistia-production_12853\', '+
+                                                                        'mediaID: \'wistia-production_977641\', '+
+                                                                        'embedServiceURL: \'http://distillery.wistia.com/x\', '+
+                                                                        'mediaDuration: \''+config.duration+'\''+
+                                                                    '} '+
+                                                                '}">' +
+                                        '<img alt="'+config.title+'" src="'+ config.preview+ '">' +
+                                    '</a>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<br>'
+                        break;
                     case 'wistia':
                         var video = window.Media.current_video;
                         var config = {

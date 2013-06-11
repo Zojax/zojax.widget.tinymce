@@ -29,16 +29,10 @@
 				<fieldset>
 					<legend>My media</legend>
                 <table style="border:0">
-                    <tr>
-                        <td>
-                            Filter:
-                        </td>
-                        <td>
-                            <input type="text" name="filter" size="20" id="zfilter1" onkeyup="ImageDialog.redrawData(this.value, 'my_media_content');">
-                        </td>
-                        <td>
-                            Sort By:
-                        </td>
+                    <!--Filter:-->
+                    <!--<input type="text" name="filter" size="20" id="zfilter1" onkeyup="ImageDialog.redrawData(this.value, 'my_media_content');">-->
+                        <!--Sort By:-->
+                        <!--</td>-->
                         <!--<td>-->
                             <!--<select onchange="ImageDialog.order(this);">-->
                                 <!--<option value="title" selected>Name</option>-->
@@ -46,21 +40,7 @@
                                 <!--<option value="modified" selected="selected">Last Modified</option>-->
                             <!--</select>-->
                         <!--</td>-->
-                        <td>
-                            <div id="up_container1">
-                                <input type="file" name="my_img_file" size="40" id="zfileup1" onchange="window.Media.upload(this.form);">
-                            </div>
-                        </td>
-                        <td>
-                            <input type="button" value="Upload" onclick="document.getElementById('zfileup1').click();">
-                        </td>
-                        <td>
-                            <span id="z_error1" style="color:red; margin-left: 20px"></span>
-                        </td>
-                        <td>
-                            <img src="img/wait.gif" style="display: none;" id="my_media_wait"/>
-                        </td>
-                    </tr>
+                        <input type="button" value="Upload" onclick="window.Media.upload();">
                 </table>
                     <div id="my_media_container" class="media_container my_media_container"></div>
 				</fieldset>
@@ -131,17 +111,9 @@
             <div id="document_media_panel" class="panel">
 				<fieldset>
 					<legend>Document media</legend>
-                    <table style="border:0">
-                        <tr>
-                            <td>
-                                Filter:
-                            </td>
-                            <td>
-                                <input type="text" name="filter" size="20" id="zfilter" onkeyup="ImageDialog.redrawData(this.value, 'my_media_content');">
-                            </td>
-                            <td>
-                                Sort By:
-                            </td>
+                                <!--Filter:-->
+                                <!--<input type="text" name="filter" size="20" id="zfilter" onkeyup="ImageDialog.redrawData(this.value, 'my_media_content');">-->
+                                <!--Sort By:-->
                             <!--<td>-->
                                 <!--<select onchange="ImageDialog.order(this);">-->
                                     <!--<option value="title" selected>Name</option>-->
@@ -149,22 +121,7 @@
                                     <!--<option value="modified" selected="selected">Last Modified</option>-->
                                 <!--</select>-->
                             <!--</td>-->
-                            <td>
-                                <div id="up_container">
-                                    <input type="file" name="document_img_file" size="40" id="zfileup2" onchange="window.Media.upload(this.form);">
-                                </div>
-                            </td>
-                            <td>
-                                <input type="button" value="Upload" onclick="document.getElementById('zfileup2').click();">
-                            </td>
-                            <td>
-                                <span id="z_error2" style="color:red; margin-left: 20px"></span>
-                            </td>
-                            <td>
-                                <img src="img/wait.gif" style="display: none;" id="document_media_wait"/>
-                            </td>
-                        </tr>
-                    </table>
+                        <input type="button" value="Upload" onclick="window.Media.upload();">
                     <div id="document_media_container" class="media_container document_media_container"></div>
 				</fieldset>
             </div>
@@ -172,7 +129,7 @@
 
  			<div id="youtube_panel" class="panel">
 				<fieldset>
-					<legend>Youtybe media</legend>
+					<legend>Youtube media</legend>
 
                     <div id="youtube_media_container" class="media_container youtube_media_container"></div>
 
@@ -1087,5 +1044,6 @@
 			<input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
 		</div>
 	</form>
+<div id="upload-form-popup"></div>
 </body>
 </html>

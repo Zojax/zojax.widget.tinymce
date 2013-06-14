@@ -1,3 +1,8 @@
+String.prototype.capitalize = function () {
+    return this.replace(/^./, function (char) {
+        return char.toUpperCase();
+    });
+};
 (function() {
 	var url;
     var $ = tinyMCE.activeEditor.getWin().parent.jQuery;
@@ -68,6 +73,9 @@
 	window.Media = {
         api_url: tinyMCE.activeEditor.getParam('mediaUrl2'),
         current_tab: 'my',
+        pageSize: 20,
+        page: 1,
+        pages_count: 1,
 
 		init : function() {
 			var html, editor, self = this;
@@ -114,15 +122,17 @@
 			self.data = clone(tinyMCEPopup.getWindowArg('data'));
 			self.dataToForm();
 			self.preview();
-
 			updateColor('bgcolor_pick', 'bgcolor');
+            if (tinyMCE.activeEditor.getParam('mediaUrl1')) {
+                $(document.getElementById('document_media_tab')).show();
+                self.loadDocumentMedia();
+            }
             self.loadMyMedia();
-            self.loadDocumentMedia();
             self.loadYoutubeMedia();
             self.loadWistiaMedia();
 		},
 
-        loadYoutubeMedia : function () {
+        loadYoutubeMedia : function (order) {
             var youtubeAPI = "https://gdata.youtube.com/feeds/api/videos?v=2";
             $.ajax({
                 url: youtubeAPI,
@@ -133,9 +143,8 @@
 //                        q: 'filter'
                 },
                 success: function( data ) {
-                    console.log(data)
                     var container = document.getElementById('youtube_media_container');
-                    window.Media.youtube_data = data.data.items;
+                    window.Media.youtube_media_data = data.data.items;
                     $.each( data.data.items, function( i, item ) {
                         for (var key in item.content){content = item.content[key]; break;}
                         $(container).append('' +
@@ -150,7 +159,7 @@
             });
         },
 
-        loadWistiaMedia : function () {
+        loadWistiaMedia : function (order) {
             var wistiaAPI = "/WistiaJsAPI/";
             $.ajax({
                 url: wistiaAPI,
@@ -162,7 +171,7 @@
                 },
                 success: function( data ) {
                     var container = document.getElementById('wistia_media_container');
-                    window.Media.wistia_data = data;
+                    window.Media.wistia_media_data = data;
                     $.each( data, function( i, item ) {
                         $(container).append('' +
                             '<div onclick="javascript:window.Media.select(this);" class="img-container" data-index="'+i+'" data-source="wistia">' +
@@ -175,55 +184,75 @@
                 }
             });
         },
-        loadMyMedia : function () {
+        loadMyMedia : function (order) {
             var urlAPI = tinyMCE.activeEditor.getParam('mediaUrl2');
+            if(!order) order = "modified";
+
+            var params = {
+                ph:80,
+                pw:80,
+                sort:order,
+                limit: this.pageSize,
+                start: (this.page -1) * this.pageSize
+            };
+
             $.ajax({
                 url: urlAPI + '/listing/',
                 type: "post",
-                data: {
-                    limit: "30",
-                    ph:	"80",
-                    pw:	"80",
-                    "start": '0'
-//                        q: 'filter'
-                },
+                data: params,
                 success: function( data ) {
                     var container = document.getElementById('my_media_container');
                     window.Media.my_media_data = data.medias;
+                    window.Media.pages_count = Math.ceil(data.total/window.Media.pageSize);
+                    if (window.Media.pages_count > 1) {
+                        $(document.getElementById('my_paginator')).show();
+                        document.getElementById('my_total_pages').innerHTML = window.Media.pages_count;
+                    }
                     $(container).html('');
                     $.each( data.medias, function( i, item ) {
                         $(container).append('' +
-                            '<div onclick="javascript:window.Media.select(this);" class="img-container" data-index="'+i+'" data-source="my_media">' +
+                            '<div onclick="javascript:window.Media.select(this);" class="img-container" data-index="'+i+'" data-source="my">' +
                                 '<div class="wraper" id="'+item.id+'">' +
                                     '<img src="'+item.preview+'">' +
-                                    '<span>'+item.name+'</span>' +
+                                    '<span>'+item.title+'</span>' +
                                 '</div>' +
                             '</div>');
                     });
                 }
             });
         },
-        loadDocumentMedia : function () {
+        loadDocumentMedia : function (order) {
             var urlAPI = tinyMCE.activeEditor.getParam('mediaUrl1');
+            if(!order) order = "modified";
+
+            var params = {
+                ph:80,
+                pw:80,
+                sort:order,
+                limit: this.pageSize,
+                start: (this.page -1) * this.pageSize
+            };
+
+
             $.ajax({
                 url: urlAPI + '/listing/',
                 type: "post",
-                data: {
-                    limit: "30",
-                    ph:	"80",
-                    pw:	"80",
-                    "start": '0'
-                },
+                data: params,
                 success: function( data ) {
                     var container = document.getElementById('document_media_container');
-                    window.Media.my_media_data = data.medias;
+                    window.Media.document_media_data = data.medias;
+                    window.Media.pages_count = Math.ceil(data.total/window.Media.pageSize);
+                    if (window.Media.pages_count > 1) {
+                        $(document.getElementById('document_paginator')).show();
+                        document.getElementById('document_total_pages').innerHTML = window.Media.pages_count;
+                    }
                     $(container).html('');
                     $.each( data.medias, function( i, item ) {
                         $(container).append('' +
-                            '<div onclick="javascript:window.Media.select(this);" class="img-container" data-index="'+i+'" data-source="document_media">' +
+                            '<div onclick="javascript:window.Media.select(this);" class="img-container" data-index="'+i+'" data-source="document">' +
                                 '<div class="wraper" id="'+item.id+'">' +
                                     '<img src="'+item.preview+'">' +
-                                    '<span>'+item.name+'</span>' +
+                                    '<span>'+item.title+'</span>' +
                                 '</div>' +
                             '</div>');
                     });
@@ -231,14 +260,42 @@
             });
         },
 
+        filterMedaiaData: function(filter){
+            var data = window.Media.getCurrentData();
+            var container = document.getElementById(window.Media.current_tab+'_media_container');
+            $(container).html('');
+            $.each( data, function( i, item ) {
+                var preview = item.preview || item.thumbnail.url || item.thumbnail.sqDefault;
+                var title = item.title || item.name;
+                if(!filter || filter.trim()=='' || title.toUpperCase().indexOf(filter.toUpperCase()) != -1 ) {
+                    $(container).append('' +
+                        '<div onclick="javascript:window.Media.select(this);" class="img-container" data-index="'+i+'" data-source="'+window.Media.current_tab+'">' +
+                            '<div class="wraper" id="'+item.id+'">' +
+                                '<img src="'+preview+'">' +
+                                '<span>'+title+'</span>' +
+                            '</div>' +
+                        '</div>');
+                }
+            });
+
+        },
+
+        getCurrentData: function (){return window.Media[window.Media.current_tab+'_media_data']},
+
+        order: function(o) {this.loadCurrentTab(o);},
+
+        loadCurrentTab: function(order){return this['load'+this.current_tab.capitalize()+'Media'](order);},
+
         changeImageTab: function (tab) {
             window.Media.current_tab = tab;
             if (tab == 'document') {
                 window.Media.api_url = tinyMCE.activeEditor.getParam('mediaUrl1');
+                window.Media.loadDocumentMedia();
             } else {
                 window.Media.api_url = tinyMCE.activeEditor.getParam('mediaUrl2');
+                window.Media.loadMyMedia();
             }
-            window.Media.page = 1;
+//            window.Media.page = 1;
 //            window.Media.loadData();
         },
 
@@ -268,7 +325,7 @@
             $(document.getElementsByClassName('img-container')).removeClass('selected');
             $(div).addClass('selected');
             window.Media.data_source = $(div).attr('data-source');
-            window.Media.current_video = window.Media[window.Media.data_source+'_data'][$(div).attr('data-index')]
+            window.Media.current_video = window.Media[window.Media.data_source+'_media_data'][$(div).attr('data-index')]
         },
 
 		insert : function() {
@@ -777,7 +834,47 @@
 			tinymce.each(defaultDialogSettings, function(v, k) {
 				setVal(k, v);
 			});
-		}
+        },
+
+        nextPage: function () {
+            if (this.page + 1 <= this.pages_count){
+                var page = this.page < this.pages_count ? this.page + 1: this.pages_count;
+                this.toPage(page);
+            }
+            return false;
+        },
+        prevPage: function () {
+            if (this.page - 1 >= 1){
+                var page = this.page > 1 ? this.page-1: 1;
+                this.toPage(page);
+            }
+            return false;
+        },
+        toPage: function (n) {
+            var p = parseInt(n);
+            if (!isNaN(p)){
+                p = (0 < p) && (p < this.pages_count) ? p: this.pages_count;
+                if (p != this.page) {
+                    this.page = p;
+                    this.loadCurrentTab();
+                }
+                document.getElementById(this.current_tab+'_current_page').value = p;
+            } else {
+                document.getElementById(this.current_tab+'_current_page').value = this.page;
+            }
+            return false;
+        },
+        lastPage: function () {
+            if (this.page != this.pages_count)
+                this.toPage(this.pages_count);
+            return false;
+        },
+        firstPage: function () {
+            if (this.page != 1)
+                this.toPage(1);
+            return false;
+        }
+
 	};
 
 	tinyMCEPopup.requireLangPack();

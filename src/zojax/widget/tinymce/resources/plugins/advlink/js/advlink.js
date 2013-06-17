@@ -155,6 +155,7 @@ function getNode(node){
 
 function chooseLink(a){
     document.getElementById('href').value = $(a).attr('data-content-link');
+    document.getElementById('title').value = $(a).children('span').text();
     $(document.getElementById('node-tree-wrapper')).find('div.tree-node-el').removeClass('tree-selected')
     $(a).parent().addClass('tree-selected');
     return false;

@@ -332,47 +332,47 @@ String.prototype.capitalize = function () {
 			var editor = tinyMCEPopup.editor;
             if (window.Media.current_video){
                 switch (window.Media.data_source) {
-                    case 'my_media':
-                    case 'document_media':
+                    case 'my':
+                    case 'document':
                         var video = window.Media.current_video;
                         var config = {
-                            url: video.assets[1].url,
-                            stil_url: video.assets[3].url,
-                            preview: video.thumbnail.url,
+                            width: $(document.getElementById('width')).val() || 320,
+                            height: $(document.getElementById('height')).val() || 240,
+                            url: video.url,
+                            preview: video.preview,
                             autoplay: $(document.getElementById('flash_play')).is(':checked'),
                             title: video.name,
-                            duration: video.duration
+                            duration: video.duration,
+                            type: video.type
                         }
                         html = '' +
-                        '<div>' +
-                            '<div class="inline-thumb-wrap">' +
-                                '<div class="thumb">' +
-                                    '<a href="'+config.url+'" class="z-media {' +
-                                                                    'width: \'640\','+
-                                                                    'height: \'480\','+
-                                                                    'type: \'wistia.video\','+
-                                                                    'preview: \''+ config.preview+ '\','+
-                                                                    'autoplay: true,'+
-                                                                    'params: {allowfullscreen: true}, ' +
-                                                                    'flashvars:{'+
-                                                                        'autoPlay: \'true\', '+
-                                                                        'stillUrl: \''+config.stil_url+'\', '+
-                                                                        'accountKey: \'wistia-production_12853\', '+
-                                                                        'mediaID: \'wistia-production_977641\', '+
-                                                                        'embedServiceURL: \'http://distillery.wistia.com/x\', '+
-                                                                        'mediaDuration: \''+config.duration+'\''+
-                                                                    '} '+
-                                                                '}">' +
-                                        '<img alt="'+config.title+'" src="'+ config.preview+ '">' +
-                                    '</a>' +
+                            '<div>' +
+                                '<div class="inline-thumb-wrap">' +
+                                    '<div class="thumb">' +
+                                        '<a href="'+config.url+'" class="z-media {' +
+                                                                                    'width:\''+ config.width+'\','+
+                                                                                    'height:\''+ config.height+'\','+
+                                                                                    'type:\''+ config.type+'\','+
+                                                                                    'preview: \''+ config.preview+ '\','+
+                                                                                    'autoplay: true, params:{allowfullscreen: true}, ' +
+                                                                                    'flashvars: { '+
+                                                                                            'type: \''+ config.type+ '\', '+
+                                                                                            'config: {clip: {\'url\':\''+config.url+'\',' +
+                                                                                                                      ' \'autoPlay\':' + config.autoplay+ ', ' +
+                                                                                                                      '\'autoBuffering\': true } },'+
+                                                                                                                      'autostart: true }}">'+
+                                            '<img alt="'+config.title+'" src="'+ config.preview+ '">' +
+                                        '</a>' +
+                                    '</div>' +
                                 '</div>' +
                             '</div>' +
-                        '</div>' +
-                        '<br>'
+                            '<br>'
                         break;
                     case 'wistia':
                         var video = window.Media.current_video;
                         var config = {
+                            width: $(document.getElementById('width')).val() || 320,
+                            height: $(document.getElementById('height')).val() || 240,
                             url: video.assets[1].url,
                             stil_url: video.assets[3].url,
                             preview: video.thumbnail.url,
@@ -389,7 +389,7 @@ String.prototype.capitalize = function () {
                                                                     'height: \'480\','+
                                                                     'type: \'wistia.video\','+
                                                                     'preview: \''+ config.preview+ '\','+
-                                                                    'autoplay: true,'+
+                                                                    'autoplay: '+ config.autoplay+ ', ' +
                                                                     'params: {allowfullscreen: true}, ' +
                                                                     'flashvars:{'+
                                                                         'autoPlay: \'true\', '+
@@ -411,6 +411,8 @@ String.prototype.capitalize = function () {
                     case 'youtube':
                         var video = window.Media.current_video;
                         var config = {
+                            width: $(document.getElementById('width')).val() || 320,
+                            height: $(document.getElementById('height')).val() || 240,
                             url: video.id,
                             preview: "http://img.youtube.com/vi/"+video.id+"/default.jpg",
                             autoplay: $(document.getElementById('flash_play')).is(':checked'),
@@ -427,10 +429,10 @@ String.prototype.capitalize = function () {
                             'autoplay: '+ config.autoplay+ ', ' +
                             'params:{allowfullscreen: true}, ' +
                             'flashvars: {type: \'youtube\', ' +
-                            'config: {\'clip\': {\'url\':\''+config.url+'\', ' +
-                            '\'autoPlay\': '+config.autoplay+', ' +
-                            '\'autoBuffering\': true } }, ' +
-                            'autostart: \''+config.autoplay+'\'}}">'+
+                                        'config: {\'clip\': {\'url\':\''+config.url+'\', ' +
+                                                            '\'autoPlay\': '+config.autoplay+', ' +
+                                                            '\'autoBuffering\': true } }, ' +
+                                    'autostart: \''+config.autoplay+'\'}}">'+
                             '<img alt="'+config.title+'" src="'+ config.preview+ '">'+
                             '</a>'+
                             '</div>'+

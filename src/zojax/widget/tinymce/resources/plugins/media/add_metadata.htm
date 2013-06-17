@@ -14,7 +14,7 @@
 
 
 <div id="upload-form-popup">
-    <form action="" id="upload-form">
+    <form action="" id="upload-form" onsubmit="">
                 <!--<td>-->
                 <!--<select onchange="ImageDialog.order(this);">-->
                 <!--<option value="title" selected>Name</option>-->
@@ -30,7 +30,7 @@
             <label class="form-item-label" style="width:80px;" for="description">Description:</label>
             <input type="text" name="description" id="description" size="40">
         </p>
-        <p>
+        <p style="display: none">
             <label class="form-item-label" style="width:80px;" for="autoplay">Autoplay:</label>
             <input type="checkbox" name="autoplay" id="autoplay" size="40">
         </p>
@@ -38,9 +38,9 @@
             <label class="form-item-label" style="width:50px;" for="file">File:</label>
             <input type="file" name="image" id="file">
             <!--<span id="z_error1" style="color:red; margin-left: 20px"></span>-->
-            <!--<img src="img/wait.gif" style="display: none;" id="my_media_wait"/>-->
+            <img src="img/wait.gif" style="display: none;" id="media_wait"/>
         </p>
-        <input type="submit" value="Upload">
+        <input type="submit" value="Upload" id="submit">
     </form>
     <script type="text/javascript">
         var $ = tinyMCE.activeEditor.getWin().parent.jQuery;
@@ -48,15 +48,16 @@
             var form = document.getElementById('upload-form');
             var callback_func = tinyMCEPopup.getWindowArg('callback');
             var api_url = tinyMCEPopup.getWindowArg('api_url');
+
+            $(document.getElementById('submit')).click(function(){
+                $(document.getElementById('media_wait')).show();
+            });
             $(form).ajaxForm({
                 type: 'post',
                 url: api_url+'upload',
                 success: function (data) {
-                    console.log(data)
                     callback_func(data);
                     tinyMCEPopup.close();
-//                    tinyMCE.activeEditor.getWin().parent.Media.loadMyMedia();
-//                    tinyMCE.activeEditor.getWin().parent.Media.loadDocumentMedia();
                 }
             });
         });

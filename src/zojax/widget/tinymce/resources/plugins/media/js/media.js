@@ -354,13 +354,13 @@ String.prototype.capitalize = function () {
                                                                                     'height:\''+ config.height+'\','+
                                                                                     'type:\''+ config.type+'\','+
                                                                                     'preview: \''+ config.preview+ '\','+
-                                                                                    'autoplay: true, params:{allowfullscreen: true}, ' +
+                                                                                    'autoplay: '+config.autoplay+', params:{allowfullscreen: true}, ' +
                                                                                     'flashvars: { '+
                                                                                             'type: \''+ config.type+ '\', '+
                                                                                             'config: {clip: {\'url\':\''+config.url+'\',' +
                                                                                                                       ' \'autoPlay\':' + config.autoplay+ ', ' +
                                                                                                                       '\'autoBuffering\': true } },'+
-                                                                                                                      'autostart: true }}">'+
+                                                                                      'autostart: '+config.autoplay+' }}">'+
                                             '<img alt="'+config.title+'" src="'+ config.preview+ '">' +
                                         '</a>' +
                                     '</div>' +

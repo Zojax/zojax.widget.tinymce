@@ -170,6 +170,7 @@ String.prototype.capitalize = function () {
 //                        q: 'filter'
                 },
                 success: function( data ) {
+                    console.log(data);
                     var container = document.getElementById('wistia_media_container');
                     window.Media.wistia_media_data = data;
                     $.each( data, function( i, item ) {
@@ -294,7 +295,9 @@ String.prototype.capitalize = function () {
             } else {
                 window.Media.api_url = tinyMCE.activeEditor.getParam('mediaUrl2');
                 window.Media.loadMyMedia();
-            }
+            };
+            from_time = document.getElementById('from_time_cont');
+            tab == 'wistia' ? $(from_time).show() : $(from_time).hide();
 //            window.Media.page = 1;
 //            window.Media.loadData();
         },
@@ -371,41 +374,88 @@ String.prototype.capitalize = function () {
                     case 'wistia':
                         var video = window.Media.current_video;
                         var config = {
-                            width: $(document.getElementById('width')).val() || 320,
-                            height: $(document.getElementById('height')).val() || 240,
+                            width: $(document.getElementById('width')).val() || 640,
+                            height: $(document.getElementById('height')).val() || 480,
                             url: video.assets[1].url,
                             stil_url: video.assets[3].url,
                             preview: video.thumbnail.url,
                             autoplay: $(document.getElementById('flash_play')).is(':checked'),
                             title: video.name,
-                            duration: video.duration
+                            duration: video.duration,
+                            id: video.hashed_id
+                        };
+                        from_time_e = document.getElementById('from_time');
+                        time_e = $(from_time_e).val();
+                        intRegex = /^\d+$/;
+                        if (intRegex.test(time_e)) {
+                            time = time_e
+                        } else {
+                            time='0';
                         }
                         html = '' +
-                        '<div>' +
-                            '<div class="inline-thumb-wrap">' +
-                                '<div class="thumb">' +
-                                    '<a href="'+config.url+'" class="z-media {' +
-                                                                    'width: \'640\','+
-                                                                    'height: \'480\','+
-                                                                    'type: \'wistia.video\','+
-                                                                    'preview: \''+ config.preview+ '\','+
-                                                                    'autoplay: '+ config.autoplay+ ', ' +
-                                                                    'params: {allowfullscreen: true}, ' +
-                                                                    'flashvars:{'+
-                                                                        'autoPlay: \'true\', '+
-                                                                        'stillUrl: \''+config.stil_url+'\', '+
-                                                                        'accountKey: \'wistia-production_12853\', '+
-                                                                        'mediaID: \'wistia-production_977641\', '+
-                                                                        'embedServiceURL: \'http://distillery.wistia.com/x\', '+
-                                                                        'mediaDuration: \''+config.duration+'\''+
-                                                                    '} '+
-                                                                '}">' +
-                                        '<img alt="'+config.title+'" src="'+ config.preview+ '">' +
-                                    '</a>' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>' +
-                        '<br>'
+//                            '<div>' +
+//                                '<div class="inline-thumb-wrap">' +
+                                    '<div class="thumb">' +
+                                        '<iframe '+
+                                         'src="http://fast.wistia.net/embed/iframe/'+config.id+'?playerColor=ff0000&time='+time+
+                                                    '&autoPlay='+config.autoplay+'&' +
+                                                    'version=v1 "' +
+                                         'allowtransparency="true" ' +
+                                         'frameborder="0" scrolling="no" ' +
+                                         'class="wistia_embed" ' +
+                                         'name="wistia_embed" ' +
+                                         'width="'+640+'" ' +
+                                         'height="' +480+ '"> '+
+                                        '</iframe>'+
+                                    '</div>' +
+//                                '</div>' +
+//                            '</div>' +
+                            '<br>';
+//                            '<div>' +
+//                                '<div class="inline-thumb-wrap">' +
+//                                    '<div class="thumb" id="ttt">' +
+//                                            '<img alt="'+config.title+'" src="'+ config.preview+ '">' +
+//                            '<script src="http://fast.wistia.net/static/E-v1.js"></script>' +
+//                            '<script>' +
+//                            'Wistia.embed("qd4mt6xge4", {' +
+//                            'playerColor: "ff0000",' +
+//                            'fullscreenButton: false,'m +
+//                            'container: "ttt",' +
+//                            'autoPlay: true,' +
+//                            'time: 30' +
+//                            '});' +
+//                            '</script>' +
+//                                    '</div>' +
+//                                '</div>' +
+//                            '</div>' +
+//                            '<br>';
+//                        html = '' +
+//                        '<div>' +
+//                            '<div class="inline-thumb-wrap">' +
+//                                '<div class="thumb">' +
+//                                    '<a href="'+config.url+'" class="z-media {time: \'11\',' +
+//                                                                    'width: \'640\','+
+//                                                                    'height: \'480\','+
+//                                                                    'type: \'wistia.video\','+
+//                                                                    'preview: \''+ config.preview+ '\','+
+//                                                                    'autoplay: '+ config.autoplay+ ', ' +
+//                                                                    'params: { time: \'11\', allowfullscreen: true}, ' +
+//                                                                    'flashvars:{ autoPlay: \'true\', '+
+//                                                                        'stillUrl: \''+config.stil_url+'\', '+
+//                                                                        'accountKey: \'wistia-production_12853\', '+
+//                                                                        'mediaID: \'wistia-production_977641\', '+
+//                                                                        'embedServiceURL: \'http://distillery.wistia.com/x\', '+
+//                                                                        'mediaDuration: \''+config.duration+'\','+
+//                                                                        'time : \'11\'' +
+//                                                                    '} '+
+//                                                                '}">' +
+//                                        '<img alt="'+config.title+'" src="'+ config.preview+ '">' +
+//                                    '</a>' +
+//                                '</div>' +
+//                            '</div>' +
+////                            '<script>alert(1);</script>' +
+//                        '</div>' +
+//                        '<br>'
                         break;
 
                     case 'youtube':

@@ -182,3 +182,16 @@ ul.tabNavigation li a:focus {
 div.paginator {
     padding-top: 5px;
 }
+
+#from_time {
+    width: 40px;
+    margin-top: 3px;
+    margin-left: 20px;
+    text-align: center;
+}
+
+#from_time_cont {
+    width: 250px; margin-left: 20px; display: none;
+    padding-left: 15px;
+    display: inline !important;
+}

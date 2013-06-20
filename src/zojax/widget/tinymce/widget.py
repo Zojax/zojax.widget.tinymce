@@ -73,7 +73,7 @@ class TinyMCETextWidget(TextAreaWidget):
 
     mce_plugin_insertdate_dateFormat = "%d/%m/%Y"
     mce_plugin_insertdate_timeFormat = "%H:%M:%S"
-    mce_extended_valid_elements = "img[style|class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]"
+    mce_extended_valid_elements = "script[charset|defer|language|src|type]|img[style|class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]"
 
     mce_paste_auto_cleanup_on_paste = True
     mce_paste_convert_headers_to_strong = True
@@ -129,6 +129,7 @@ class TinyMCETextWidget(TextAreaWidget):
         if self.request.locale.id.language in MCE_LANGS:
             mceOptions += ('language : "%s", ' % \
                            self.request.locale.id.language)
+        mceOptions += 'mce_extended_valid_elements : "script[charset|defer|language|src|type]|img[style|class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",\n'
         return template % {"name": self.id, "options": mceOptions}
 
     def render(self):

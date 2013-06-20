@@ -405,7 +405,8 @@ String.prototype.capitalize = function () {
                                          'class="wistia_embed" ' +
                                          'name="wistia_embed" ' +
                                          'width="'+config.width+'" ' +
-                                         'height="' +config.height+ '"> '+
+                                         'height="' +config.height+ '" '+
+                                         'style="background: url('+config.preview+'); background-size: 100% 100%;"> '+
                                         '</iframe>'+
                                     '</div>' +
 //                                '</div>' +

@@ -193,5 +193,5 @@ div.paginator {
 #from_time_cont {
     width: 250px; margin-left: 20px; display: none;
     padding-left: 15px;
-    display: inline !important;
+    /*display: inline !important;*/
 }

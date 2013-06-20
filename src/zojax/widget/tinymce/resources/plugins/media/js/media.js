@@ -170,7 +170,6 @@ String.prototype.capitalize = function () {
 //                        q: 'filter'
                 },
                 success: function( data ) {
-                    console.log(data);
                     var container = document.getElementById('wistia_media_container');
                     window.Media.wistia_media_data = data;
                     $.each( data, function( i, item ) {
@@ -296,8 +295,9 @@ String.prototype.capitalize = function () {
                 window.Media.api_url = tinyMCE.activeEditor.getParam('mediaUrl2');
                 window.Media.loadMyMedia();
             };
-            from_time = document.getElementById('from_time_cont');
-            tab == 'wistia' ? $(from_time).show() : $(from_time).hide();
+            var from_time = document.getElementById('from_time_cont');
+            tab == 'wistia' ? $(from_time).css('display','inline') : $(from_time).hide();
+//            tab == 'wistia' ? $(from_time).show() : $(from_time).hide();
 //            window.Media.page = 1;
 //            window.Media.loadData();
         },
@@ -399,13 +399,13 @@ String.prototype.capitalize = function () {
                                         '<iframe '+
                                          'src="http://fast.wistia.net/embed/iframe/'+config.id+'?playerColor=ff0000&time='+time+
                                                     '&autoPlay='+config.autoplay+'&' +
-                                                    'version=v1 "' +
+                                                    'version=v1"' +
                                          'allowtransparency="true" ' +
                                          'frameborder="0" scrolling="no" ' +
                                          'class="wistia_embed" ' +
                                          'name="wistia_embed" ' +
-                                         'width="'+640+'" ' +
-                                         'height="' +480+ '"> '+
+                                         'width="'+config.width+'" ' +
+                                         'height="' +config.height+ '"> '+
                                         '</iframe>'+
                                     '</div>' +
 //                                '</div>' +

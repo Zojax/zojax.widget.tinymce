@@ -197,7 +197,7 @@ String.prototype.capitalize = function () {
             };
 
             $.ajax({
-                url: urlAPI + '/listing/',
+                url: urlAPI + 'listing/',
                 type: "post",
                 data: params,
                 success: function( data ) {
@@ -211,9 +211,10 @@ String.prototype.capitalize = function () {
                     $(container).html('');
                     $.each( data.medias, function( i, item ) {
                         $(container).append('' +
-                            '<div onclick="javascript:window.Media.select(this);" class="img-container" data-index="'+i+'" data-source="my">' +
+                            '<div class="img-container" data-index="'+i+'" data-source="my">' +
                                 '<div class="wraper" id="'+item.id+'">' +
-                                    '<img src="'+item.preview+'">' +
+                                    '<span title="Delete Image" class="z_delete" id="'+ item.name+'" onclick="javascript:window.Media.removeMedia(this);">x</span>' +
+                                    '<img onclick="javascript:window.Media.select(this);" src="'+item.preview+'">' +
                                     '<span>'+item.title+'</span>' +
                                 '</div>' +
                             '</div>');
@@ -235,7 +236,7 @@ String.prototype.capitalize = function () {
 
 
             $.ajax({
-                url: urlAPI + '/listing/',
+                url: urlAPI + 'listing/',
                 type: "post",
                 data: params,
                 success: function( data ) {
@@ -251,6 +252,7 @@ String.prototype.capitalize = function () {
                         $(container).append('' +
                             '<div onclick="javascript:window.Media.select(this);" class="img-container" data-index="'+i+'" data-source="document">' +
                                 '<div class="wraper" id="'+item.id+'">' +
+                                    '<span title="Delete Image" class="z_delete" id="'+ item.name+'" onclick="javascript:window.Media.removeMedia(this);">x</span>' +
                                     '<img src="'+item.preview+'">' +
                                     '<span>'+item.title+'</span>' +
                                 '</div>' +
@@ -259,6 +261,24 @@ String.prototype.capitalize = function () {
                 }
             });
         },
+
+        removeMedia: function(image) {
+
+            tinyMCEPopup.confirm(tinyMCEPopup.getLang('advimage_dlg.remove')+image.id +"?", function(s) {
+                if (s){
+                    var x = new XMLHttpRequest();
+                    x.onreadystatechange = function() {
+                        if (x.readyState === x.DONE) {
+                            window.Media.loadCurrentTab();
+                        }
+                    };
+                    x.open('POST', window.Media.api_url+'remove');
+                    x.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+                    x.send('media='+image.id);
+                }
+            })
+        },
+
 
         filterMedaiaData: function(filter){
             var data = window.Media.getCurrentData();

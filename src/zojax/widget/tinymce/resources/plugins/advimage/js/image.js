@@ -461,11 +461,14 @@ var ImageDialog = {
 	updateImageData : function(img, st) {
 		var f = document.forms[0];
 		if (!st) {
-			f.elements.width.value = img.width == 0 || img.width > ImageDialog.imageMaxWidth ? ImageDialog.imageMaxWidth : img.width;
-			f.elements.height.value = img.height == 0 || ImageDialog.imageMaxHeight ? ImageDialog.imageMaxHeight : img.height;
+//			f.elements.width.value = img.width == 0 || img.width > ImageDialog.imageMaxWidth ? ImageDialog.imageMaxWidth : img.width;
+//			f.elements.height.value = img.height == 0 || ImageDialog.imageMaxHeight ? ImageDialog.imageMaxHeight : img.height;
+            if(img.width > ImageDialog.imageMaxWidth) {
+                f.elements.width.value = ImageDialog.imageMaxWidth;
+            } else {
+                if (img.height > ImageDialog.imageMaxHeight) f.elements.height.value = ImageDialog.imageMaxHeight;
+            }
 		}
-
-		this.preloadImg = img;
 	},
 
 	changeAppearance : function() {

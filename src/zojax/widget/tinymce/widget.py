@@ -31,7 +31,25 @@ from zojax.content.attachment.interfaces import IAttachmentsAware
 template = """<script type="text/javascript">
 tinyMCE.init({
 mode : "exact", %(options)s
-elements : "%(name)s" }); </script> """
+elements : "%(name)s" }); </script>
+<script>
+function check_url(url) {
+        var x = new XMLHttpRequest();
+        x.onreadystatechange = function() {
+            if (x.readyState == x.DONE) {
+                var ct = this.getResponseHeader('content-type');
+                if (ct != null && ct.indexOf('image') !== -1) {
+                    return true
+                } else {
+                    return false;
+                }
+            }
+        };
+        x.open('GET', url, false);
+        x.send();
+}
+</script>
+"""
 
 OPT_PREFIX="mce_"
 OPT_PREFIX_LEN = len(OPT_PREFIX)

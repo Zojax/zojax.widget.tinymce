@@ -955,3 +955,10 @@ String.prototype.capitalize = function () {
 		Media.init();
 	});
 })();
+
+
+function hide_time() {
+    var $ = tinyMCE.activeEditor.getWin().parent.jQuery;
+    var from_time = document.getElementById('from_time_cont');
+    $(from_time).hide();
+}

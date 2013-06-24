@@ -26,6 +26,7 @@ from zojax.richtext.interfaces import IRichTextWidget, IRichTextWidgetFactory
 
 from zojax.resourcepackage.library import include
 from zojax.content.attachment.interfaces import IAttachmentsAware
+from interfaces import TinyMCEEditor
 
 
 template = """<script type="text/javascript">
@@ -185,6 +186,14 @@ class TinyMCETextWidget(TextAreaWidget):
                 self.value = removeAllProxies(self.value).text
             else:
                 self.value = unicode(self.value)
+
+
+        configlet = getUtility(TinyMCEEditor)
+        self.mce_imageMaxWidth = configlet.imageMaxWidth
+        self.mce_imageMaxHeight = configlet.imageMaxHeight
+        self.mce_wistiaApiUsername = configlet.wistiaApiUsername
+        self.mce_wistiaApiPassword = configlet.wistiaApiPassword
+        self.mce_wistiaApiProxyUrl = configlet.wistiaApiProxyUrl
 
         return super(TinyMCETextWidget, self).render()
 

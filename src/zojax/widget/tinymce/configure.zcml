@@ -64,5 +64,14 @@
     type="javascript"
     mapping=".css:zrt" />
 
+  <!-- configlet -->
+  <zojax:configlet
+     name="system.contenteditor.tinymce"
+     title="TinyMCE Editor"
+     description="TinyMCE editor configuration."
+     schema=".interfaces.TinyMCEEditor"
+     class=".configlet.TinyMCEConfiglet" />
+
+
 
 </configure>

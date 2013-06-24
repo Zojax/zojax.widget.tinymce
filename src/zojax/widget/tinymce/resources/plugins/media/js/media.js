@@ -130,6 +130,18 @@ String.prototype.capitalize = function () {
             self.loadMyMedia();
             self.loadYoutubeMedia();
             self.loadWistiaMedia();
+
+            console.log(tinyMCE.activeEditor.getParam('imageMaxWidth'))
+            console.log(tinyMCE.activeEditor.getParam('imageMaxHeight'))
+            console.log(tinyMCE.activeEditor.getParam('wistiaApiUsername'))
+            console.log(tinyMCE.activeEditor.getParam('wistiaApiPassword'))
+            console.log(tinyMCE.activeEditor.getParam('wistiaApiProxyUrl'))
+            self.mce_imageMaxHeight = configlet.imageMaxHeight
+            self.mce_wistiaApiUsername = configlet.wistiaApiUsername
+            self.mce_wistiaApiPassword = configlet.wistiaApiPassword
+            self.mce_wistiaApiProxyUrl = configlet.wistiaApiProxyUrl
+
+
 		},
 
         loadYoutubeMedia : function (q) {

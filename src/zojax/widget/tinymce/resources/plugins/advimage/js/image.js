@@ -235,27 +235,59 @@ var ImageDialog = {
 	},
 
 
-    checkUrl: function (url, callback) {
+    testImage: function (url, callback, timeout)
+    {
+        timeout = timeout || 5000;
+        var timedOut = false, timer;
+        var img = new Image();
         var args = Array.prototype.slice.call(arguments).slice(2);
-        var x = new XMLHttpRequest();
-        x.onreadystatechange = function() {
-            if (x.readyState === x.DONE) {
-                var ct = this.getResponseHeader('content-type');
-                if (ct != null && ct.indexOf('image') !== -1) {
-                    return callback.apply(ImageDialog, args);
-                } else {
-                    tinyMCEPopup.confirm(tinyMCEPopup.getLang('advimage_dlg.incorrect_url'), function(s) {
-                        if (s)
-                            return callback.apply(ImageDialog, args);
-                    });
-                }
+        img.onerror = img.onabort = function () {
+            if (!timedOut) {
+                tinyMCEPopup.confirm(tinyMCEPopup.getLang('advimage_dlg.incorrect_url'), function (s) {
+                    if (s)
+                        return callback.apply(ImageDialog, args);
+                });
             }
         };
-        x.open('HEAD', url, true);
-        x.send();
+        img.onload = function () {
+            if (!timedOut) {
+                clearTimeout(timer);
+                return callback.apply(ImageDialog, args);
+            }
+        };
+        img.src = url;
+        timer = setTimeout(function () {
+            timedOut = true;
+            tinyMCEPopup.confirm(tinyMCEPopup.getLang('advimage_dlg.incorrect_url'), function(s) {
+                if (s)
+                    return callback.apply(ImageDialog, args);
+            });
+        }, timeout);
+    },
+
+    checkUrl: function (url, callback) {
+        var args = Array.prototype.slice.call(arguments).slice(2);
+        ImageDialog.testImage(url, callback);
+//        var x = new XMLHttpRequest();
+//        x.onreadystatechange = function() {
+//            if (x.readyState === x.DONE) {
+//                var ct = this.getResponseHeader('content-type');
+//                if (ct != null && ct.indexOf('image') !== -1) {
+//                    return callback.apply(ImageDialog, args);
+//                } else {
+//                    tinyMCEPopup.confirm(tinyMCEPopup.getLang('advimage_dlg.incorrect_url'), function(s) {
+//                        if (s)
+//                            return callback.apply(ImageDialog, args);
+//                    });
+//                }
+//            }
+//        };
+//        x.open('HEAD', url, true);
+//        x.send();
     },
 
     insertOriginal: function(){
+        console.log(ImageDialog.current_tab);
         var f = document.forms[0], nl = f.elements;
         nl.width.value = ImageDialog.current_image.width;
         nl.height.value = ImageDialog.current_image.height;

@@ -406,12 +406,13 @@ String.prototype.capitalize = function () {
                         };
                         from_time_e = document.getElementById('from_time');
                         time_e = $(from_time_e).val();
-                        intRegex = /^\d+$/;
-                        if (intRegex.test(time_e)) {
-                            time = time_e
-                        } else {
-                            time='0';
-                        }
+//                        intRegex = /^\d+$/;
+//                        if (intRegex.test(time_e)) {
+//                            time = time_e
+//                        } else {
+//                            time='0';
+//                        }
+                        time = hmsToSecondsOnly(time_e);
                         html = '' +
 //                            '<div>' +
 //                                '<div class="inline-thumb-wrap">' +
@@ -961,4 +962,16 @@ function hide_time() {
     var $ = tinyMCE.activeEditor.getWin().parent.jQuery;
     var from_time = document.getElementById('from_time_cont');
     $(from_time).hide();
+}
+
+function hmsToSecondsOnly(str) {
+    var p = str.split(':'),
+        s = 0, m = 1;
+
+    while (p.length > 0) {
+        s += m * parseInt(p.pop(), 10);
+        m *= 60;
+    }
+
+    if(isNaN(s)) return 0; else return s;
 }

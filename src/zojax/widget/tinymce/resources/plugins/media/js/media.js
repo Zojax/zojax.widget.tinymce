@@ -73,7 +73,7 @@ String.prototype.capitalize = function () {
 	window.Media = {
         api_url: tinyMCE.activeEditor.getParam('mediaUrl2'),
         current_tab: 'my',
-        pageSize: 20,
+        pageSize: 30,
         page: 1,
         pages_count: 1,
 
@@ -132,18 +132,19 @@ String.prototype.capitalize = function () {
             self.loadWistiaMedia();
 		},
 
-        loadYoutubeMedia : function (order) {
+        loadYoutubeMedia : function (q) {
             var youtubeAPI = "https://gdata.youtube.com/feeds/api/videos?v=2";
             $.ajax({
                 url: youtubeAPI,
 
                 data: {
                     alt: 'jsonc',
-                    "max-results": '30'
-//                        q: 'filter'
+                    "max-results": '30',
+                    q: q || ''
                 },
                 success: function( data ) {
                     var container = document.getElementById('youtube_media_container');
+                    container.innerHTML = '';
                     window.Media.youtube_media_data = data.data.items;
                     $.each( data.data.items, function( i, item ) {
                         for (var key in item.content){content = item.content[key]; break;}
@@ -165,12 +166,25 @@ String.prototype.capitalize = function () {
                 url: wistiaAPI,
                 data: {
                     alt: 'jsonc',
-                    "limit": '30',
-                    "start": '0'
+                    sort:order,
+                    limit: this.pageSize,
+                    start: (this.page -1) * this.pageSize
 //                        q: 'filter'
                 },
                 success: function( data ) {
+                    if (data.length == 0) {
+                        window.Media.page -= 1;
+                        document.getElementById('wistia_current_page').value = window.Media.page;
+                        return;
+                    }
                     var container = document.getElementById('wistia_media_container');
+                    container.innerHTML = '';
+                    window.Media.my_media_data = data.medias;
+//                    window.Media.pages_count = Math.ceil(data.total/window.Media.pageSize);
+//                    if (window.Media.pages_count > 1) {
+                        $(document.getElementById('wistia_paginator')).show();
+//                        document.getElementById('wistia_total_pages').innerHTML = window.Media.pages_count;
+//                    }
                     window.Media.wistia_media_data = data;
                     $.each( data, function( i, item ) {
                         $(container).append('' +
@@ -910,9 +924,8 @@ String.prototype.capitalize = function () {
         },
 
         nextPage: function () {
-            if (this.page + 1 <= this.pages_count){
-                var page = this.page < this.pages_count ? this.page + 1: this.pages_count;
-                this.toPage(page);
+            if (this.page + 1 < this.pages_count || this.current_tab == 'wistia'){
+                this.toPage(this.page + 1);
             }
             return false;
         },
@@ -926,7 +939,7 @@ String.prototype.capitalize = function () {
         toPage: function (n) {
             var p = parseInt(n);
             if (!isNaN(p)){
-                p = (0 < p) && (p < this.pages_count) ? p: this.pages_count;
+                p = ((0 < p) && (p < this.pages_count)) || this.current_tab == 'wistia' ? p: this.pages_count;
                 if (p != this.page) {
                     this.page = p;
                     this.loadCurrentTab();
@@ -938,13 +951,11 @@ String.prototype.capitalize = function () {
             return false;
         },
         lastPage: function () {
-            if (this.page != this.pages_count)
-                this.toPage(this.pages_count);
+            this.toPage(this.pages_count);
             return false;
         },
         firstPage: function () {
-            if (this.page != 1)
-                this.toPage(1);
+            this.toPage(1);
             return false;
         }
 

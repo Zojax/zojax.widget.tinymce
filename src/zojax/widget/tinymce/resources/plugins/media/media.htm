@@ -52,7 +52,7 @@
 				<fieldset>
 					<legend>Document media</legend>
                     Filter:
-                    <input type="text" name="filter" size="20" id="zfilter1" onkeyup="window.Media.filterMedaiaData(this.value);">
+                    <input type="text" name="filter" size="20" onkeyup="window.Media.filterMedaiaData(this.value);">
                     Sort By:
                     <select onchange="window.Media.order(this.value);">
                         <option value="title" selected>Name</option>
@@ -75,7 +75,7 @@
 				<fieldset>
 					<legend>Youtube media</legend>
                     Filter:
-                    <input type="text" name="filter" size="20" id="zfilter1" onkeyup="window.Media.filterMedaiaData(this.value);">
+                    <input type="text" name="filter" size="20" onkeyup="window.Media.loadYoutubeMedia(this.value);">
                     <div id="youtube_media_container" class="media_container youtube_media_container"></div>
 				</fieldset>
 			</div>
@@ -83,9 +83,17 @@
 				<fieldset>
 					<legend>Wistia media</legend>
                     Filter:
-                    <input type="text" name="filter" size="20" id="zfilter1" onkeyup="window.Media.filterMedaiaData(this.value);">
+                    <input type="text" name="filter" size="20" onkeyup="window.Media.filterMedaiaData(this.value);">
                     <div id="wistia_media_container" class="media_container wistia_media_container"></div>
 				</fieldset>
+
+                <div class="paginator" style="display: none" id="wistia_paginator">
+                    <a href="javascript:void(0)" onclick="javascript:window.Media.firstPage();">&lt;&lt;</a>
+                    <a href="javascript:void(0)" onclick="javascript:window.Media.prevPage();">&lt;</a>
+                    <input id="wistia_current_page" type="text" value="1" name="page" onchange="javascript:window.Media.toPage(this.value)" readonly/></span>
+                    <a href="javascript:void(0)" onclick="javascript:window.Media.nextPage();">&gt;</a>
+                    <!--<a href="javascript:void(0)" onclick="javascript:window.Media.lastPage();">&gt;&gt;</a>-->
+                </div>
 			</div>
             <div id="general_panel" class="panel">
 				<fieldset>

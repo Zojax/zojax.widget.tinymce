@@ -15,6 +15,14 @@
 #shockwave_swvolume, #shockwave_swframe, #shockwave_swurl, #shockwave_swstretchvalign, #shockwave_swstretchhalign, #shockwave_swstretchstyle { width: 90px }
 #qt_qtsrc { width: 200px }
 iframe {border: 1px solid gray}
+
+.panel_wrapper div.current {
+    overflow: hidden;
+}
+div.media_container {
+    height: 350px;
+    overflow-y: scroll;
+}
 div.media_container div {
     float: left;
     margin: 4px 4px 4px 4px;
@@ -56,8 +64,7 @@ div#document_images_panel.current input {
     width: 75px;
 }
 
-div.paginator input#document_current_page,
-div.paginator input#my_current_page{
+div.paginator input {
     width: 20px;
     text-align: center;
 }

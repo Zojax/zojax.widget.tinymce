@@ -130,6 +130,13 @@ class TinyMCETextWidget(TextAreaWidget):
             except TypeError:
                 pass
 
+        configlet = getUtility(TinyMCEEditor)
+        self.mce_imageMaxWidth = configlet.imageMaxWidth
+        self.mce_imageMaxHeight = configlet.imageMaxHeight
+        self.mce_wistiaApiUsername = configlet.wistiaApiUsername
+        self.mce_wistiaApiPassword = configlet.wistiaApiPassword
+        self.mce_wistiaApiProxyUrl = configlet.wistiaApiProxyUrl
+
         mceOptions = []
         for k in dir(self):
             if k.startswith(OPT_PREFIX):
@@ -186,14 +193,6 @@ class TinyMCETextWidget(TextAreaWidget):
                 self.value = removeAllProxies(self.value).text
             else:
                 self.value = unicode(self.value)
-
-
-        configlet = getUtility(TinyMCEEditor)
-        self.mce_imageMaxWidth = configlet.imageMaxWidth
-        self.mce_imageMaxHeight = configlet.imageMaxHeight
-        self.mce_wistiaApiUsername = configlet.wistiaApiUsername
-        self.mce_wistiaApiPassword = configlet.wistiaApiPassword
-        self.mce_wistiaApiProxyUrl = configlet.wistiaApiProxyUrl
 
         return super(TinyMCETextWidget, self).render()
 

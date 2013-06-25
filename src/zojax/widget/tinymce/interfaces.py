@@ -27,15 +27,15 @@ class TinyMCEEditor(interface.Interface):
     """ rich text field """
 
 
-    imageMaxWidth = schema.Int(
+    imageMaxWidth = schema.TextLine(
                         title=_('Max Image Width'),
                         description=_('The maximum width of the image is inserted via the wysiwyg-editor'),
-                        default=480)
+                        default=u'480')
 
-    imageMaxHeight = schema.Int(
+    imageMaxHeight = schema.TextLine(
                         title=_('Max Image Height'),
                         description=_('The maximum height of the image is inserted via the wysiwyg-editor'),
-                        default=360)
+                        default=u'360')
 #
     wistiaApiUsername = schema.TextLine(title=_('Wistia API Username'),
                                 default = u'api',
@@ -49,8 +49,8 @@ class TinyMCEEditor(interface.Interface):
                         default = u'https://api.wistia.com/v1/',
                         required = False,)
 
-    wistiaApiProxyUrl = schema.TextLine(title=_('Wistia API Proxy URL'),
-        default = u'/WistiaJsAPI/',
+    wistiaApiProxyUrl = schema.TextLine(title=_('Wistia API Proxy URL for TinyMCE'),
+        default = u'/WistiaTinyMCEJsAPI/',
         required = False,)
 
     # autoUpload = schema.Bool(title=_('Allow image browser auto upload'),

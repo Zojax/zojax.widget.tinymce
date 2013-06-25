@@ -131,17 +131,9 @@ String.prototype.capitalize = function () {
             self.loadYoutubeMedia();
             self.loadWistiaMedia();
 
-            console.log(tinyMCE.activeEditor.getParam('imageMaxWidth'))
-            console.log(tinyMCE.activeEditor.getParam('imageMaxHeight'))
             console.log(tinyMCE.activeEditor.getParam('wistiaApiUsername'))
             console.log(tinyMCE.activeEditor.getParam('wistiaApiPassword'))
             console.log(tinyMCE.activeEditor.getParam('wistiaApiProxyUrl'))
-            self.mce_imageMaxHeight = configlet.imageMaxHeight
-            self.mce_wistiaApiUsername = configlet.wistiaApiUsername
-            self.mce_wistiaApiPassword = configlet.wistiaApiPassword
-            self.mce_wistiaApiProxyUrl = configlet.wistiaApiProxyUrl
-
-
 		},
 
         loadYoutubeMedia : function (q) {
@@ -173,7 +165,8 @@ String.prototype.capitalize = function () {
         },
 
         loadWistiaMedia : function (order) {
-            var wistiaAPI = "/WistiaJsAPI/";
+//            var wistiaAPI = "/WistiaJsAPI/";
+            var wistiaAPI = tinyMCE.activeEditor.getParam('wistiaApiProxyUrl');
             $.ajax({
                 url: wistiaAPI,
                 data: {

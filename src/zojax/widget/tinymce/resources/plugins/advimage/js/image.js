@@ -5,8 +5,8 @@ var ImageDialog = {
     my_images: {},
     document_images: {},
     api_url: tinyMCE.activeEditor.getParam('url2'),
-    imageMaxWidth: 480,
-    imageMaxHeight: 360,
+    imageMaxWidth: tinyMCE.activeEditor.getParam('imageMaxWidth'),
+    imageMaxHeight: tinyMCE.activeEditor.getParam('imageMaxHeight'),
     pageSize: 30,
     page: 1,
     pages_count: 1,
@@ -287,7 +287,6 @@ var ImageDialog = {
     },
 
     insertOriginal: function(){
-        console.log(ImageDialog.current_tab);
         var f = document.forms[0], nl = f.elements;
         nl.width.value = ImageDialog.current_image.width;
         nl.height.value = ImageDialog.current_image.height;
@@ -493,13 +492,17 @@ var ImageDialog = {
 	updateImageData : function(img, st) {
 		var f = document.forms[0];
 		if (!st) {
-//			f.elements.width.value = img.width == 0 || img.width > ImageDialog.imageMaxWidth ? ImageDialog.imageMaxWidth : img.width;
-//			f.elements.height.value = img.height == 0 || ImageDialog.imageMaxHeight ? ImageDialog.imageMaxHeight : img.height;
+            f.elements.height.value = img.height;
+            f.elements.width.value = img.width;
             if(img.width > ImageDialog.imageMaxWidth) {
                 f.elements.width.value = ImageDialog.imageMaxWidth;
-            } else {
-                if (img.height > ImageDialog.imageMaxHeight) f.elements.height.value = ImageDialog.imageMaxHeight;
+                f.elements.height.value = ((ImageDialog.imageMaxWidth / this.current_image.width) * this.current_image.height).toFixed(0);
             }
+            if(f.elements.height.value > ImageDialog.imageMaxHeight) {
+                f.elements.width.value = ((ImageDialog.imageMaxHeight / f.elements.height.value) * f.elements.width.value).toFixed(0);
+                f.elements.height.value = ImageDialog.imageMaxHeight;
+            }
+
 		}
 	},
 
@@ -667,8 +670,7 @@ var ImageDialog = {
             type: 'post',
             url: ImageDialog.api_url+'upload',
             success: function (data) {
-//                console.log(data);
-                ImageDialog.success();
+                ImageDialog.success(data);
             }
         });
 

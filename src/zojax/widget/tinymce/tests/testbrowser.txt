@@ -60,12 +60,18 @@ Let's edit content, editor includes js to head and includes tiny_mce.js
 ------------------------------------------------------------------------
 
     >>> user.open('http://localhost/page/context.html')
+    >>> print user.contents
     <html>
     ...
     <script type="text/javascript" src="http://localhost/.../tiny-mce/tiny_mce.js"></script>
+    <BLANKLINE>
     <script type="text/javascript" src="http://localhost/.../jquery.js"></script>
+    <BLANKLINE>
     <script type="text/javascript" src="http://localhost/.../jquery-plugins.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://localhost/.../jquery-plugins.css" />
+    <BLANKLINE>
     <script type="text/javascript" src="http://localhost/.../jq-ajax-form.js"></script>
+    <base href="http://localhost/page/context.html/" />
     ...
     <script type="text/javascript">
         tinyMCE.init({
@@ -125,8 +131,27 @@ Let's edit content, editor includes js to head and includes tiny_mce.js
     <div>Test page</div>
 
 
+Change max image size
+
+    >>> user.open('http://localhost/settings/system/contenteditor/tinymce/')
+    >>> user.getControl(name="form.widgets.imageMaxHeight").value = '500'
+    >>> user.getControl(name="form.widgets.imageMaxWidth").value = '300'
+    >>> user.getControl('Save').click()
+
+    >>> user.open('http://localhost/page/context.html')
+    >>> print user.contents
+    <html>
+    ...
+           imageMaxHeight : "500",
+           imageMaxWidth : "300",
+    ...
+    </html>
+
+
 Let's check APIs for plugin
 ----------------------------
     >>> import simplejson
     >>> user.open('/WistiaTinyMCEJsAPI/?alt=jsonc&limit=30&start=0')
     >>> simplejson.loads(user.contents)
+    [...]
+    >>> ids = getUtility(IIntIds)

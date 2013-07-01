@@ -994,8 +994,12 @@
 		<div class="mceActionPanel">
 			<input type="submit" id="insert" name="insert" value="{#insert}" />
             <div id="from_time_cont">
-                 Play from time:
-                <input type="text" id="from_time" name="from_time" value="0" />
+                 <span class="tooltip" title="Fill in video play start point in the next field in the following format: hh:mm:ss">
+                     Play from time:
+                </span>
+                <input type="text" id="from_time" name="from_time" value="0"
+                 class="tooltip" title="Fill in video play start point in the next field in the following format: hh:mm:ss"
+                />
             </div>
 			<input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
 		</div>

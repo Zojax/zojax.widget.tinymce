@@ -20,6 +20,24 @@ var ImageDialog = {
 			document.write('<script language="javascript" type="text/javascript" src="' + tinyMCEPopup.editor.documentBaseURI.toAbsolute(url) + '"></script>');
 	},
 
+
+    changeSize: function (type) {
+        var width, height, scale, size;
+
+        if (get('constrain').checked) {
+            width = parseInt(getVal('width') || (this.data.type == 'audio' ? "300" : "320"), 10);
+            height = parseInt(getVal('height') || (this.data.type == 'audio' ? "32" : "240"), 10);
+
+            if (type == 'width') {
+                this.height = Math.round((width / this.width) * height);
+                setVal('height', this.height);
+            } else {
+                this.width = Math.round((height / this.height) * width);
+                setVal('width', this.width);
+            }
+        }
+    },
+
 	init : function(ed) {
 		var f = document.forms[0], nl = f.elements, ed = tinyMCEPopup.editor, dom = ed.dom, n = ed.selection.getNode(), fl = tinyMCEPopup.getParam('external_image_list', 'tinyMCEImageList');
 
@@ -524,15 +542,22 @@ var ImageDialog = {
 	changeHeight : function() {
 		var f = document.forms[0], tp, t = this;
 
-		if (!f.constrain.checked || !t.preloadImg) {
+
+		if (!f.constrain.checked) {
 			return;
 		}
 
-		if (f.width.value == "" || f.height.value == "")
+        var $ = tinyMCE.activeEditor.getWin().parent.jQuery;
+        var w = document.getElementById('width3');
+        var width = $(w).val();
+        var h = document.getElementById('height3');
+        var height = $(h).val();
+
+        if (width == "" || height == "")
 			return;
 
-		tp = (parseInt(f.width.value) / parseInt(t.preloadImg.width)) * t.preloadImg.height;
-		f.height.value = tp.toFixed(0);
+		tp = (parseInt(width) / parseInt(t.preloadImg.width)) * t.preloadImg.height;
+        $(h).val(tp.toFixed(0));
 	},
 
 	changeWidth : function() {
@@ -542,11 +567,13 @@ var ImageDialog = {
 			return;
 		}
 
+
 		if (f.width.value == "" || f.height.value == "")
 			return;
 
 		tp = (parseInt(f.height.value) / parseInt(t.preloadImg.height)) * t.preloadImg.width;
 		f.width.value = tp.toFixed(0);
+
 	},
 
 	updateStyle : function(ty) {

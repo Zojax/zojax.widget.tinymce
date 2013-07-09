@@ -561,8 +561,6 @@ var ImageDialog = {
         var h = document.getElementById('height');
         var height = $(h).val();
 
-        console.log(ImageDialog.cimage.width, ImageDialog.cimage.height);
-
         if (width == "" || height == "")
 			return;
 

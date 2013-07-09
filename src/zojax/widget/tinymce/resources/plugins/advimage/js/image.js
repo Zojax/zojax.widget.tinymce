@@ -5,11 +5,14 @@ var ImageDialog = {
     my_images: {},
     document_images: {},
     api_url: tinyMCE.activeEditor.getParam('url2'),
-    imageMaxWidth: tinyMCE.activeEditor.getParam('imageMaxWidth'),
-    imageMaxHeight: tinyMCE.activeEditor.getParam('imageMaxHeight'),
+//    imageMaxWidth: tinyMCE.activeEditor.getParam('imageMaxWidth'),
+//    imageMaxHeight: tinyMCE.activeEditor.getParam('imageMaxHeight'),
+    imageMaxWidth: 640,
+    imageMaxHeight: 480,
     pageSize: 30,
     page: 1,
     pages_count: 1,
+    cimage: {},
 
 	preInit : function() {
 		var url;
@@ -509,13 +512,18 @@ var ImageDialog = {
 
 	updateImageData : function(img, st) {
 		var f = document.forms[0];
+
+        ImageDialog.cimage = img;
 		if (!st) {
+
             f.elements.height.value = img.height;
             f.elements.width.value = img.width;
             if(img.width > ImageDialog.imageMaxWidth) {
                 f.elements.width.value = ImageDialog.imageMaxWidth;
-                f.elements.height.value = ((ImageDialog.imageMaxWidth / this.current_image.width) * this.current_image.height).toFixed(0);
+                f.elements.height.value = ((ImageDialog.imageMaxWidth / img.width) * img.height).toFixed(0);
             }
+
+
             if(f.elements.height.value > ImageDialog.imageMaxHeight) {
                 f.elements.width.value = ((ImageDialog.imageMaxHeight / f.elements.height.value) * f.elements.width.value).toFixed(0);
                 f.elements.height.value = ImageDialog.imageMaxHeight;
@@ -548,22 +556,24 @@ var ImageDialog = {
 		}
 
         var $ = tinyMCE.activeEditor.getWin().parent.jQuery;
-        var w = document.getElementById('width3');
+        var w = document.getElementById('width');
         var width = $(w).val();
-        var h = document.getElementById('height3');
+        var h = document.getElementById('height');
         var height = $(h).val();
+
+        console.log(ImageDialog.cimage.width, ImageDialog.cimage.height);
 
         if (width == "" || height == "")
 			return;
 
-		tp = (parseInt(width) / parseInt(t.preloadImg.width)) * t.preloadImg.height;
+		tp = (parseInt(width) / parseInt(ImageDialog.cimage.width)) * ImageDialog.cimage.height;
         $(h).val(tp.toFixed(0));
 	},
 
 	changeWidth : function() {
 		var f = document.forms[0], tp, t = this;
 
-		if (!f.constrain.checked || !t.preloadImg) {
+		if (!f.constrain.checked) {
 			return;
 		}
 
@@ -571,7 +581,7 @@ var ImageDialog = {
 		if (f.width.value == "" || f.height.value == "")
 			return;
 
-		tp = (parseInt(f.height.value) / parseInt(t.preloadImg.height)) * t.preloadImg.width;
+		tp = (parseInt(f.height.value) / parseInt(ImageDialog.cimage.height)) * ImageDialog.cimage.width;
 		f.width.value = tp.toFixed(0);
 
 	},

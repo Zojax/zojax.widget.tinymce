@@ -74,8 +74,15 @@ String.prototype.capitalize = function () {
         api_url: tinyMCE.activeEditor.getParam('mediaUrl2'),
         current_tab: 'my',
         pageSize: 30,
-        page: 1,
+        wistia_page: 1,
+        my_page: 1,
+        document_page: 1,
+        youtube_page: 1,
         pages_count: 1,
+        wistia_count: 1,
+        my_count: 1,
+        document_count: 1,
+        youtube_count: 1,
 
 		init : function() {
 			var html, editor, self = this;
@@ -126,7 +133,38 @@ String.prototype.capitalize = function () {
             if (tinyMCE.activeEditor.getParam('mediaUrl1')) {
                 $(document.getElementById('document_media_tab')).show();
                 self.loadDocumentMedia();
-            }
+            };
+
+            // wistia count
+            s = self;
+            var wistiaAPI = tinyMCE.activeEditor.getParam('wistiaApiProxyUrl');
+            $.ajax({
+                url: wistiaAPI,
+                data: {
+                    alt: 'jsonc'
+                },
+                success: function (data) {
+                    s.wistia_count = Math.ceil(data.length/s.pageSize);
+                    console.log('wistia pages: ', s.wistia_count);
+                }
+            });
+            // my count
+            var params = {
+                ph: 80,
+                pw: 80
+            };
+            var urlAPI = tinyMCE.activeEditor.getParam('mediaUrl2');
+            $.ajax({
+                url: urlAPI + 'listing/',
+                type: "post",
+                data: params,
+                success: function (data) {
+                    s.my_count = Math.ceil(data.total/s.pageSize);
+                    console.log('my pages: ', s.my_count);
+                    document.getElementById('my_total_pages').innerHTML = s.my_count;
+                }
+            });
+
             self.loadMyMedia();
             self.loadYoutubeMedia();
             self.loadWistiaMedia();
@@ -144,12 +182,26 @@ String.prototype.capitalize = function () {
                 data: {
                     alt: 'jsonc',
                     "max-results": '30',
+                    "start-index" : (this.youtube_page - 1) * window.Media.pageSize+1,
+//                    "start-index" : this.youtube_page,
                     q: q || ''
                 },
                 success: function( data ) {
                     var container = document.getElementById('youtube_media_container');
                     container.innerHTML = '';
                     window.Media.youtube_media_data = data.data.items;
+
+
+                    document.getElementById('youtube_current_page').value = window.Media.youtube_page;
+                    window.Media.youtube_count = Math.ceil(data.data.totalItems / window.Media.pageSize);
+                    if (window.Media.youtube_count > 10) window.Media.youtube_count=10;
+                    if (window.Media.youtube_count > 1) {
+                        $(document.getElementById('youtube_paginator')).show();
+                        document.getElementById('youtube_total_pages').innerHTML = window.Media.youtube_count;
+                    };
+
+                    $(document.getElementById('youtube_paginator')).show();
+                    console.log('you tube count: ', data.data.totalItems)
                     $.each( data.data.items, function( i, item ) {
                         for (var key in item.content){content = item.content[key]; break;}
                         $(container).append('' +
@@ -173,13 +225,16 @@ String.prototype.capitalize = function () {
                     alt: 'jsonc',
                     sort:order,
                     limit: this.pageSize,
-                    start: (this.page -1) * this.pageSize
+                    start: (this.wistia_page -1) * this.pageSize
 //                        q: 'filter'
                 },
                 success: function( data ) {
+
                     if (data.length == 0) {
-                        window.Media.page -= 1;
-                        document.getElementById('wistia_current_page').value = window.Media.page;
+                        var container = document.getElementById('wistia_media_container');
+                        container.innerHTML = '';
+                        window.Media.my_media_data = data.medias;
+                        container.innerHTML = '';
                         return;
                     }
                     var container = document.getElementById('wistia_media_container');
@@ -212,34 +267,34 @@ String.prototype.capitalize = function () {
                 pw:80,
                 sort:order,
                 limit: this.pageSize,
-                start: (this.page -1) * this.pageSize
+                start: (this.my_page -1) * this.pageSize
             };
 
-            $.ajax({
-                url: urlAPI + 'listing/',
-                type: "post",
-                data: params,
-                success: function( data ) {
-                    var container = document.getElementById('my_media_container');
-                    window.Media.my_media_data = data.medias;
-                    window.Media.pages_count = Math.ceil(data.total/window.Media.pageSize);
-                    if (window.Media.pages_count > 1) {
-                        $(document.getElementById('my_paginator')).show();
-                        document.getElementById('my_total_pages').innerHTML = window.Media.pages_count;
+                $.ajax({
+                    url: urlAPI + 'listing/',
+                    type: "post",
+                    data: params,
+                    success: function( data ) {
+                        var container = document.getElementById('my_media_container');
+                        window.Media.my_media_data = data.medias;
+//                        window.Media.pages_count = Math.ceil(data.total/window.Media.pageSize);
+//                        if (window.Media.pages_count > 1) {
+                            $(document.getElementById('my_paginator')).show();
+//                            document.getElementById('my_total_pages').innerHTML = window.Media.pages_count;
+//                        }
+                        $(container).html('');
+                        $.each( data.medias, function( i, item ) {
+                            $(container).append('' +
+                                '<div class="img-container" data-index="'+i+'" data-source="my" onclick="javascript:window.Media.select(this);">' +
+                                    '<div class="wraper" id="'+item.id+'">' +
+                                        '<span title="Delete Image" class="z_delete" id="'+ item.name+'" onclick="javascript:window.Media.removeMedia(this);">x</span>' +
+                                        '<img src="'+item.preview+'">' +
+                                        '<span>'+item.title+'</span>' +
+                                    '</div>' +
+                                '</div>');
+                        });
                     }
-                    $(container).html('');
-                    $.each( data.medias, function( i, item ) {
-                        $(container).append('' +
-                            '<div class="img-container" data-index="'+i+'" data-source="my">' +
-                                '<div class="wraper" id="'+item.id+'">' +
-                                    '<span title="Delete Image" class="z_delete" id="'+ item.name+'" onclick="javascript:window.Media.removeMedia(this);">x</span>' +
-                                    '<img onclick="javascript:window.Media.select(this);" src="'+item.preview+'">' +
-                                    '<span>'+item.title+'</span>' +
-                                '</div>' +
-                            '</div>');
-                    });
-                }
-            });
+                });
         },
         loadDocumentMedia : function (order) {
             var urlAPI = tinyMCE.activeEditor.getParam('mediaUrl1');
@@ -250,7 +305,7 @@ String.prototype.capitalize = function () {
                 pw:80,
                 sort:order,
                 limit: this.pageSize,
-                start: (this.page -1) * this.pageSize
+                start: (this.document_page -1) * this.pageSize
             };
 
 
@@ -261,11 +316,11 @@ String.prototype.capitalize = function () {
                 success: function( data ) {
                     var container = document.getElementById('document_media_container');
                     window.Media.document_media_data = data.medias;
-                    window.Media.pages_count = Math.ceil(data.total/window.Media.pageSize);
-                    if (window.Media.pages_count > 1) {
+                    window.Media.document_count = Math.ceil(data.total/window.Media.pageSize);
+//                    if (window.Media.document_count > 1) {
                         $(document.getElementById('document_paginator')).show();
-                        document.getElementById('document_total_pages').innerHTML = window.Media.pages_count;
-                    }
+                        document.getElementById('document_total_pages').innerHTML = window.Media.document_count;
+//                    }
                     $(container).html('');
                     $.each( data.medias, function( i, item ) {
                         $(container).append('' +
@@ -364,6 +419,7 @@ String.prototype.capitalize = function () {
         },
 
         select: function(div){
+            console.log(div);
             $(document.getElementsByClassName('img-container')).removeClass('selected');
             $(div).addClass('selected');
             window.Media.data_source = $(div).attr('data-source');
@@ -373,8 +429,43 @@ String.prototype.capitalize = function () {
 		insert : function() {
 			var editor = tinyMCEPopup.editor;
             if (window.Media.current_video){
+                console.log(window.Media.current_video, window.Media.data_source);
                 switch (window.Media.data_source) {
                     case 'my':
+                        var video = window.Media.current_video;
+                        var config = {
+                            width: $(document.getElementById('width')).val() || 320,
+                            height: $(document.getElementById('height')).val() || 240,
+                            url: video.url,
+                            preview: video.preview,
+                            autoplay: $(document.getElementById('flash_play')).is(':checked'),
+                            title: video.name,
+                            duration: video.duration,
+                            type: video.type
+                        }
+                        html = '' +
+                            '<div>' +
+                                '<div class="inline-thumb-wrap">' +
+                                    '<div class="thumb">' +
+                                        '<a href="'+config.url+'" class="z-media {' +
+                                                                                    'width:\''+ config.width+'\','+
+                                                                                    'height:\''+ config.height+'\','+
+                                                                                    'type:\''+ config.type+'\','+
+                                                                                    'preview: \''+ config.preview+ '\','+
+                                                                                    'autoplay: '+config.autoplay+', params:{allowfullscreen: true}, ' +
+                                                                                    'flashvars: { '+
+                                                                                            'type: \''+ config.type+ '\', '+
+                                                                                            'config: {clip: {\'url\':\''+config.url+'\',' +
+                                                                                                                      ' \'autoPlay\':' + config.autoplay+ ', ' +
+                                                                                                                      '\'autoBuffering\': true } },'+
+                                                                                      'autostart: '+config.autoplay+' }}">'+
+                                            '<img alt="'+config.title+'" src="'+ config.preview+ '">' +
+                                        '</a>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<br>'
+                        break;
                     case 'document':
                         var video = window.Media.current_video;
                         var config = {
@@ -535,8 +626,7 @@ String.prototype.capitalize = function () {
                 }
                 editor.execCommand('mceRepaint');
                 editor.execCommand('mceInsertContent', false, html);
-
-
+                editor.execCommand('mceRepaint');
 
             } else {
                 this.formToData();
@@ -930,34 +1020,98 @@ String.prototype.capitalize = function () {
         },
 
         nextPage: function () {
-            if (this.page + 1 < this.pages_count || this.current_tab == 'wistia'){
-                this.toPage(this.page + 1);
-            }
+//            if (this.page + 1 < this.pages_count || this.current_tab == 'wistia'){
+//                this.toPage(this.page + 1);
+//            }
+            switch(window.Media.current_tab) {
+                case 'wistia':
+                    console.log('next page: ',this.wistia_page + 1, this.wistia_count);
+                    if (this.wistia_page + 1 <= this.wistia_count) {
+                        this.toPage(this.wistia_page + 1);
+                    };
+                case 'my':
+                    console.log('my next page: ',this.my_page + 1, this.my_count);
+                    if (this.my_page + 1 <= this.my_count) {
+                        this.toPage(this.my_page + 1);
+                    };
+                case 'document':
+                    console.log('document next page: ',this.document_page + 1, this.document_count);
+                    if (this.document_page + 1 <= this.document_count) {
+                        this.toPage(this.document_page + 1);
+                    };
+                case 'youtube':
+                    console.log('youtube next page: ',this.youtube_page + 1, this.youtube_count);
+                    if (this.youtube_page + 1 <= this.youtube_count) {
+                        this.toPage(this.youtube_page + 1);
+                    };
+            };
+
             return false;
         },
         prevPage: function () {
-            if (this.page - 1 >= 1){
-                var page = this.page > 1 ? this.page-1: 1;
-                this.toPage(page);
-            }
+            switch(window.Media.current_tab) {
+                case 'wistia':
+                    if (this.wistia_page - 1 >= 1){
+                        this.toPage(this.wistia_page - 1);
+                    }
+                case 'my':
+                    if (this.my_page - 1 >= 1){
+                        this.toPage(this.my_page - 1);
+                    }
+                case 'document':
+                    if (this.document_page - 1 >= 1){
+                        this.toPage(this.document_page - 1);
+                    }
+                case 'youtube':
+                    if (this.youtube_page - 1 >= 1){
+                        this.toPage(this.youtube_page - 1);
+                    }
+            };
             return false;
         },
         toPage: function (n) {
+            console.log(n);
             var p = parseInt(n);
             if (!isNaN(p)){
-                p = ((0 < p) && (p < this.pages_count)) || this.current_tab == 'wistia' ? p: this.pages_count;
-                if (p != this.page) {
-                    this.page = p;
-                    this.loadCurrentTab();
+                switch (window.Media.current_tab) {
+                    case "wistia":
+                        this.wistia_page = p;
+                        this.loadCurrentTab();
+                        break;
+                    case "my":
+                        this.my_page = p;
+                        this.loadCurrentTab();
+                        break;
+                    case "document":
+                        this.document_page = p;
+                        this.loadCurrentTab();
+                        break;
+                    case "youtube":
+                        this.youtube_page = p;
+                        this.loadCurrentTab();
+                        break;
                 }
                 document.getElementById(this.current_tab+'_current_page').value = p;
-            } else {
-                document.getElementById(this.current_tab+'_current_page').value = this.page;
+                return false;
             }
-            return false;
         },
         lastPage: function () {
-            this.toPage(this.pages_count);
+            t = this;
+            console.log(window.Media.current_tab);
+            switch(window.Media.current_tab) {
+                case 'wistia':
+                        t.toPage(t.wistia_count);
+                        break;
+                case 'my':
+                        t.toPage(this.my_count);
+                        break;
+                case 'document':
+                        t.toPage(this.document_count);
+                        break;
+                case 'youtube':
+                        t.toPage(this.youtube_count);
+                        break;
+            };
             return false;
         },
         firstPage: function () {

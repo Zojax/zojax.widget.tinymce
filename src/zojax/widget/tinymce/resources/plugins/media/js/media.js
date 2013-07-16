@@ -136,7 +136,7 @@ String.prototype.capitalize = function () {
             };
 
             // wistia count
-            s = self;
+            var s = this;
             var wistiaAPI = tinyMCE.activeEditor.getParam('wistiaApiProxyUrl');
             $.ajax({
                 url: wistiaAPI,
@@ -145,43 +145,25 @@ String.prototype.capitalize = function () {
                 },
                 success: function (data) {
                     s.wistia_count = Math.ceil(data.length/s.pageSize);
-                    console.log('wistia pages: ', s.wistia_count);
-                }
-            });
-            // my count
-            var params = {
-                ph: 80,
-                pw: 80
-            };
-            var urlAPI = tinyMCE.activeEditor.getParam('mediaUrl2');
-            $.ajax({
-                url: urlAPI + 'listing/',
-                type: "post",
-                data: params,
-                success: function (data) {
-                    s.my_count = Math.ceil(data.total/s.pageSize);
-                    console.log('my pages: ', s.my_count);
-                    document.getElementById('my_total_pages').innerHTML = s.my_count;
+                    self.loadWistiaMedia();
                 }
             });
 
             self.loadMyMedia();
             self.loadYoutubeMedia();
-            self.loadWistiaMedia();
 
-            console.log(tinyMCE.activeEditor.getParam('wistiaApiUsername'))
-            console.log(tinyMCE.activeEditor.getParam('wistiaApiPassword'))
-            console.log(tinyMCE.activeEditor.getParam('wistiaApiProxyUrl'))
 		},
 
         loadYoutubeMedia : function (q) {
+            s = this;
+            $(document.getElementById('youtube_paginator')).hide();
             var youtubeAPI = "https://gdata.youtube.com/feeds/api/videos?v=2";
             $.ajax({
                 url: youtubeAPI,
 
                 data: {
                     alt: 'jsonc',
-                    "max-results": '30',
+                    "max-results": window.Media.pageSize,
                     "start-index" : (this.youtube_page - 1) * window.Media.pageSize+1,
 //                    "start-index" : this.youtube_page,
                     q: q || ''
@@ -191,17 +173,17 @@ String.prototype.capitalize = function () {
                     container.innerHTML = '';
                     window.Media.youtube_media_data = data.data.items;
 
-
                     document.getElementById('youtube_current_page').value = window.Media.youtube_page;
                     window.Media.youtube_count = Math.ceil(data.data.totalItems / window.Media.pageSize);
                     if (window.Media.youtube_count > 10) window.Media.youtube_count=10;
                     if (window.Media.youtube_count > 1) {
                         $(document.getElementById('youtube_paginator')).show();
-                        document.getElementById('youtube_total_pages').innerHTML = window.Media.youtube_count;
+                    };
+                    document.getElementById('youtube_total_pages').innerHTML = window.Media.youtube_count;
+                    if (s.youtube_page > s.youtube_count && s.youtube_count>0) {
+                        s.toPage(s.youtube_count>0?s.youtube_count:1);
                     };
 
-                    $(document.getElementById('youtube_paginator')).show();
-                    console.log('you tube count: ', data.data.totalItems)
                     $.each( data.data.items, function( i, item ) {
                         for (var key in item.content){content = item.content[key]; break;}
                         $(container).append('' +
@@ -218,7 +200,9 @@ String.prototype.capitalize = function () {
 
         loadWistiaMedia : function (order) {
 //            var wistiaAPI = "/WistiaJsAPI/";
+            var s = this;
             var wistiaAPI = tinyMCE.activeEditor.getParam('wistiaApiProxyUrl');
+            $(document.getElementById('wistia_paginator')).hide();
             $.ajax({
                 url: wistiaAPI,
                 data: {
@@ -233,19 +217,16 @@ String.prototype.capitalize = function () {
                     if (data.length == 0) {
                         var container = document.getElementById('wistia_media_container');
                         container.innerHTML = '';
-                        window.Media.my_media_data = data.medias;
+                        window.Media.wistia_media_data = data.medias;
                         container.innerHTML = '';
                         return;
-                    }
+                    };
                     var container = document.getElementById('wistia_media_container');
                     container.innerHTML = '';
-                    window.Media.my_media_data = data.medias;
-//                    window.Media.pages_count = Math.ceil(data.total/window.Media.pageSize);
-//                    if (window.Media.pages_count > 1) {
+                    if (s.wistia_count > 1) {
                         $(document.getElementById('wistia_paginator')).show();
-//                        document.getElementById('wistia_total_pages').innerHTML = window.Media.pages_count;
-//                    }
-                    window.Media.wistia_media_data = data;
+                        document.getElementById('wistia_total_pages').innerHTML = s.wistia_count;
+                    }
                     $.each( data, function( i, item ) {
                         $(container).append('' +
                             '<div onclick="javascript:window.Media.select(this);" class="img-container" data-index="'+i+'" data-source="wistia">' +
@@ -259,8 +240,10 @@ String.prototype.capitalize = function () {
             });
         },
         loadMyMedia : function (order) {
+            s = this;
             var urlAPI = tinyMCE.activeEditor.getParam('mediaUrl2');
             if(!order) order = "modified";
+            $(document.getElementById('my_paginator')).hide();
 
             var params = {
                 ph:80,
@@ -275,13 +258,29 @@ String.prototype.capitalize = function () {
                     type: "post",
                     data: params,
                     success: function( data ) {
+
+                        // my count
+                        var urlAPI = tinyMCE.activeEditor.getParam('mediaUrl2');
+                        $.ajax({
+                            url: urlAPI + 'listing/',
+                            type: "post",
+                            data: {ph: 80, pw: 80},
+                            success: function (data) {
+                                s.my_count = Math.ceil(data.total / s.pageSize);
+                                document.getElementById('my_total_pages').innerHTML = s.my_count;
+                                if (s.my_count > 1) {
+                                   $(document.getElementById('my_paginator')).show();
+                                    document.getElementById('my_total_pages').innerHTML = s.my_count;
+                                };
+                                if (s.my_page > s.my_count) {
+                                    s.my_page = s.my_count;
+                                    s.toPage(s.my_count);
+                                };
+                            }
+                        });
+
                         var container = document.getElementById('my_media_container');
                         window.Media.my_media_data = data.medias;
-//                        window.Media.pages_count = Math.ceil(data.total/window.Media.pageSize);
-//                        if (window.Media.pages_count > 1) {
-                            $(document.getElementById('my_paginator')).show();
-//                            document.getElementById('my_total_pages').innerHTML = window.Media.pages_count;
-//                        }
                         $(container).html('');
                         $.each( data.medias, function( i, item ) {
                             $(container).append('' +
@@ -297,6 +296,10 @@ String.prototype.capitalize = function () {
                 });
         },
         loadDocumentMedia : function (order) {
+
+            s = this;
+            $(document.getElementById('document_paginator')).hide();
+
             var urlAPI = tinyMCE.activeEditor.getParam('mediaUrl1');
             if(!order) order = "modified";
 
@@ -314,13 +317,22 @@ String.prototype.capitalize = function () {
                 type: "post",
                 data: params,
                 success: function( data ) {
+
+                    $.ajax({
+                        url: urlAPI + 'listing/',
+                        type: "post",
+                        data: {ph: 80, pw: 80},
+                        success: function (data) {
+                            s.document_count = Math.ceil(data.total / s.pageSize);
+                            document.getElementById('document_total_pages').innerHTML = s.document_count;
+                            if (s.document_count  > 1) {
+                                $(document.getElementById('document_paginator')).show();
+                            };
+                            if (s.document_page > s.document_count) s.toPage(s.document_count);
+                        }
+                    });
                     var container = document.getElementById('document_media_container');
                     window.Media.document_media_data = data.medias;
-                    window.Media.document_count = Math.ceil(data.total/window.Media.pageSize);
-//                    if (window.Media.document_count > 1) {
-                        $(document.getElementById('document_paginator')).show();
-                        document.getElementById('document_total_pages').innerHTML = window.Media.document_count;
-//                    }
                     $(container).html('');
                     $.each( data.medias, function( i, item ) {
                         $(container).append('' +
@@ -419,7 +431,6 @@ String.prototype.capitalize = function () {
         },
 
         select: function(div){
-            console.log(div);
             $(document.getElementsByClassName('img-container')).removeClass('selected');
             $(div).addClass('selected');
             window.Media.data_source = $(div).attr('data-source');
@@ -429,7 +440,6 @@ String.prototype.capitalize = function () {
 		insert : function() {
 			var editor = tinyMCEPopup.editor;
             if (window.Media.current_video){
-                console.log(window.Media.current_video, window.Media.data_source);
                 switch (window.Media.data_source) {
                     case 'my':
                         var video = window.Media.current_video;
@@ -735,8 +745,8 @@ String.prototype.capitalize = function () {
 					ext = src.replace(/^.*\.([^.]+)$/, '$1');
 					if (typeInfo = mediaPlugin.getType(ext))
 						data.type = typeInfo.name.toLowerCase();
-
 					setVal('media_type', data.type);
+
 				}
 
 				if (data.type == "video" || data.type == "audio") {
@@ -1025,22 +1035,18 @@ String.prototype.capitalize = function () {
 //            }
             switch(window.Media.current_tab) {
                 case 'wistia':
-                    console.log('next page: ',this.wistia_page + 1, this.wistia_count);
                     if (this.wistia_page + 1 <= this.wistia_count) {
                         this.toPage(this.wistia_page + 1);
                     };
                 case 'my':
-                    console.log('my next page: ',this.my_page + 1, this.my_count);
                     if (this.my_page + 1 <= this.my_count) {
                         this.toPage(this.my_page + 1);
                     };
                 case 'document':
-                    console.log('document next page: ',this.document_page + 1, this.document_count);
                     if (this.document_page + 1 <= this.document_count) {
                         this.toPage(this.document_page + 1);
                     };
                 case 'youtube':
-                    console.log('youtube next page: ',this.youtube_page + 1, this.youtube_count);
                     if (this.youtube_page + 1 <= this.youtube_count) {
                         this.toPage(this.youtube_page + 1);
                     };
@@ -1070,7 +1076,7 @@ String.prototype.capitalize = function () {
             return false;
         },
         toPage: function (n) {
-            console.log(n);
+            var $ = tinyMCE.activeEditor.getWin().parent.jQuery;
             var p = parseInt(n);
             if (!isNaN(p)){
                 switch (window.Media.current_tab) {
@@ -1088,7 +1094,7 @@ String.prototype.capitalize = function () {
                         break;
                     case "youtube":
                         this.youtube_page = p;
-                        this.loadCurrentTab();
+                        this.loadYoutubeMedia($(document.getElementById('youtube_filter')).val());
                         break;
                 }
                 document.getElementById(this.current_tab+'_current_page').value = p;
@@ -1097,7 +1103,6 @@ String.prototype.capitalize = function () {
         },
         lastPage: function () {
             t = this;
-            console.log(window.Media.current_tab);
             switch(window.Media.current_tab) {
                 case 'wistia':
                         t.toPage(t.wistia_count);

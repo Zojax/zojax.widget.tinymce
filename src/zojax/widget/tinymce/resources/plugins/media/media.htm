@@ -15,7 +15,7 @@
 		<div class="tabs" role="presentation">
 			<ul>
 				<li id="my_media_tab" class="current" aria-controls="my_media_panel" onclick="javascript:window.Media.changeImageTab('my');"><span><a href="javascript:mcTabs.displayTab('my_media_tab','my_media_panel');Media.formToData();" onmousedown="return false;">My media</a></span></li>
-				<li style="display: none" id="document_media_tab" aria-controls="document_media_panel" onclick="javascript:window.Media.changeImageTab('document');"><span><a href="javascript:mcTabs.displayTab('document_media_tab','document_media_panel');Media.formToData();" onmousedown="return false;">Document media media</a></span></li>
+				<li style="display: none" id="document_media_tab" aria-controls="document_media_panel" onclick="javascript:window.Media.changeImageTab('document');"><span><a href="javascript:mcTabs.displayTab('document_media_tab','document_media_panel');Media.formToData();" onmousedown="return false;">Document media</a></span></li>
 				<li id="youtube_tab" aria-controls="youtube_panel"  onclick="javascript:window.Media.changeImageTab('youtube');"><span><a href="javascript:mcTabs.displayTab('youtube_tab','youtube_panel');Media.formToData();" onmousedown="return false;">Youtube media</a></span></li>
 				<li id="wistia_tab" aria-controls="wistia_panel"  onclick="javascript:window.Media.changeImageTab('wistia');"><span><a href="javascript:mcTabs.displayTab('wistia_tab','wistia_panel');Media.formToData();" onmousedown="return false;">Wistia media</a></span></li>
 				<li id="general_tab" aria-controls="general_panel"><span><a href="javascript:mcTabs.displayTab('general_tab','general_panel');Media.formToData(); hide_time();" onmousedown="return false;">{#media_dlg.general}</a></span></li>
@@ -75,7 +75,7 @@
 				<fieldset>
 					<legend>Youtube media</legend>
                     Filter:
-                    <input type="text" name="filter" size="20" onkeyup="window.Media.youtube_page=1;window.Media.loadYoutubeMedia(this.value);">
+                    <input type="text" name="filter" size="20" onkeyup="window.Media.youtube_page=1;window.Media.loadYoutubeMedia(this.value);" id="youtube_filter">
                     <div id="youtube_media_container" class="media_container youtube_media_container"></div>
                 </fieldset>
                 <div class="paginator" style="display: none" id="youtube_paginator">
@@ -98,7 +98,7 @@
                 <div class="paginator" style="display: none" id="wistia_paginator">
                     <a href="javascript:void(0)" onclick="javascript:window.Media.firstPage();">&lt;&lt;</a>
                     <a href="javascript:void(0)" onclick="javascript:window.Media.prevPage();">&lt;</a>
-                    <input id="wistia_current_page" type="text" value="1" name="page" onchange="javascript:window.Media.toPage(this.value)" readonly/></span>
+                    <input id="wistia_current_page" type="text" value="1" name="page" onchange="javascript:window.Media.toPage(this.value)" readonly/></span>of <span id="wistia_total_pages">1</span>
                     <a href="javascript:void(0)" onclick="javascript:window.Media.nextPage();">&gt;</a>
                     <a href="javascript:void(0)" onclick="javascript:window.Media.lastPage();">&gt;&gt;</a>
                 </div>

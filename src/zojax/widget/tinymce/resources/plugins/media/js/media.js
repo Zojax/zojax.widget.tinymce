@@ -73,7 +73,7 @@ String.prototype.capitalize = function () {
 	window.Media = {
         api_url: tinyMCE.activeEditor.getParam('mediaUrl2'),
         current_tab: 'my',
-        pageSize: 10,
+        pageSize: 30,
         wistia_page: 1,
         my_page: 1,
         document_page: 1,

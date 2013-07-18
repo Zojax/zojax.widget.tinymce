@@ -73,7 +73,7 @@ String.prototype.capitalize = function () {
 	window.Media = {
         api_url: tinyMCE.activeEditor.getParam('mediaUrl2'),
         current_tab: 'my',
-        pageSize: 30,
+        pageSize: 10,
         wistia_page: 1,
         my_page: 1,
         document_page: 1,
@@ -210,9 +210,13 @@ String.prototype.capitalize = function () {
                     sort:order,
                     limit: this.pageSize,
                     start: (this.wistia_page -1) * this.pageSize
-//                        q: 'filter'
+//                    q: 'filter'
                 },
                 success: function( data ) {
+
+
+                    window.Media.wistia_media_data = data;
+                    console.log('wistia page:', s.wistia_page, 'count')
 
                     if (data.length == 0) {
                         var container = document.getElementById('wistia_media_container');
@@ -368,6 +372,8 @@ String.prototype.capitalize = function () {
 
         filterMedaiaData: function(filter){
             var data = window.Media.getCurrentData();
+
+            console.log(data);
             var container = document.getElementById(window.Media.current_tab+'_media_container');
             $(container).html('');
             $.each( data, function( i, item ) {
@@ -386,7 +392,9 @@ String.prototype.capitalize = function () {
 
         },
 
-        getCurrentData: function (){return window.Media[window.Media.current_tab+'_media_data']},
+        getCurrentData: function (){
+            return window.Media[window.Media.current_tab+'_media_data']
+        },
 
         order: function(o) {this.loadCurrentTab(o);},
 
@@ -1038,18 +1046,22 @@ String.prototype.capitalize = function () {
                     if (this.wistia_page + 1 <= this.wistia_count) {
                         this.toPage(this.wistia_page + 1);
                     };
+                    break;
                 case 'my':
                     if (this.my_page + 1 <= this.my_count) {
                         this.toPage(this.my_page + 1);
                     };
+                    break;
                 case 'document':
                     if (this.document_page + 1 <= this.document_count) {
                         this.toPage(this.document_page + 1);
                     };
+                    break;
                 case 'youtube':
                     if (this.youtube_page + 1 <= this.youtube_count) {
                         this.toPage(this.youtube_page + 1);
                     };
+                    break;
             };
 
             return false;
@@ -1059,19 +1071,23 @@ String.prototype.capitalize = function () {
                 case 'wistia':
                     if (this.wistia_page - 1 >= 1){
                         this.toPage(this.wistia_page - 1);
-                    }
+                    };
+                    break;
                 case 'my':
                     if (this.my_page - 1 >= 1){
                         this.toPage(this.my_page - 1);
-                    }
+                    };
+                    break;
                 case 'document':
                     if (this.document_page - 1 >= 1){
                         this.toPage(this.document_page - 1);
-                    }
+                    };
+                    break;
                 case 'youtube':
                     if (this.youtube_page - 1 >= 1){
                         this.toPage(this.youtube_page - 1);
-                    }
+                    };
+                    break;
             };
             return false;
         },

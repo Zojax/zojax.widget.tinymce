@@ -216,7 +216,6 @@ String.prototype.capitalize = function () {
 
 
                     window.Media.wistia_media_data = data;
-                    console.log('wistia page:', s.wistia_page, 'count')
 
                     if (data.length == 0) {
                         var container = document.getElementById('wistia_media_container');
@@ -373,7 +372,6 @@ String.prototype.capitalize = function () {
         filterMedaiaData: function(filter){
             var data = window.Media.getCurrentData();
 
-            console.log(data);
             var container = document.getElementById(window.Media.current_tab+'_media_container');
             $(container).html('');
             $.each( data, function( i, item ) {
@@ -609,7 +607,6 @@ String.prototype.capitalize = function () {
 ////                            '<script>alert(1);</script>' +
 //                        '</div>' +
 //                        '<br>'
-                        console.log(html);
                         break;
 
                     case 'youtube':
@@ -646,7 +643,6 @@ String.prototype.capitalize = function () {
                         break;
 
                 }
-                console.log(html);
                 editor.execCommand('mceRepaint');
                 editor.execCommand('mceInsertContent', false, html);
                 editor.execCommand('mceRepaint');

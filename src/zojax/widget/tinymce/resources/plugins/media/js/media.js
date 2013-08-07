@@ -544,15 +544,18 @@ String.prototype.capitalize = function () {
                         html = '' +
 //                            '<div>' +
 //                                '<div class="inline-thumb-wrap">' +
-                                    '<div class="thumb">' +
+                                    '<div class="thumb" src="test">' +
                                         '<iframe '+
                                          'src="http://fast.wistia.net/embed/iframe/'+config.id+'?playerColor=ff0000&time='+time+
                                                     '&autoPlay='+config.autoplay+'&' +
-                                                    'version=v1"' +
+                                                    'version=v1" ' +
+                                         'name="http://fast.wistia.net/embed/iframe/'+config.id+'?playerColor=ff0000&time='+time+
+                                                    '&autoPlay='+config.autoplay+'&' +
+                                                    'version=v1" ' +
                                          'allowtransparency="true" ' +
                                          'frameborder="0" scrolling="no" ' +
                                          'class="wistia_embed" ' +
-                                         'name="wistia_embed" ' +
+//                                         'name="wistia_embed" ' +
                                          'width="'+config.width+'" ' +
                                          'height="' +config.height+ '" '+
                                          'style="background: url('+config.preview+'); background-size: 100% 100%;"> '+
@@ -606,6 +609,7 @@ String.prototype.capitalize = function () {
 ////                            '<script>alert(1);</script>' +
 //                        '</div>' +
 //                        '<br>'
+                        console.log(html);
                         break;
 
                     case 'youtube':
@@ -642,6 +646,7 @@ String.prototype.capitalize = function () {
                         break;
 
                 }
+                console.log(html);
                 editor.execCommand('mceRepaint');
                 editor.execCommand('mceInsertContent', false, html);
                 editor.execCommand('mceRepaint');

@@ -42,7 +42,7 @@ class TinyMCEEditor(interface.Interface):
                                 required = False,)
 
     wistiaApiPassword = schema.TextLine(title=_('Wistia API Password'),
-                                default = u'50fe24d3645fd924b3b2ce55aa061273104ecb40',
+                                default = u'128c131035e547c01d1ed370e2bbdcdf96c6424e',
                                 required = False,)
 
     wistiaBaseApiUrl = schema.TextLine(title=_('Wistia Base API URL'),

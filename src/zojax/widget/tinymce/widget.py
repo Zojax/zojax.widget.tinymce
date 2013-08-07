@@ -155,7 +155,7 @@ class TinyMCETextWidget(TextAreaWidget):
         if self.request.locale.id.language in MCE_LANGS:
             mceOptions += ('language : "%s", ' % \
                            self.request.locale.id.language)
-        mceOptions += 'mce_extended_valid_elements : "script[charset|defer|language|src|type]|img[style|class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",\n'
+        mceOptions += 'mce_extended_valid_elements : "iframe[src|style|class|src2|width|height|allowtransparency|frameborder|name]|script[charset|defer|language|src|type]|img[style|class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",\n'
         return template % {"name": self.id, "options": mceOptions}
 
     def render(self):

@@ -64,6 +64,12 @@
     type="javascript"
     mapping=".css:zrt" />
 
+<zojax:resourceinclude
+     name="iframe.js"
+     library="jquery-plugins" require="jquery"
+     type="javascript" file="iframe.js" />
+
+
   <!-- configlet -->
   <zojax:configlet
      name="system.contenteditor.tinymce"

@@ -208,6 +208,8 @@ String.prototype.capitalize = function () {
                 data: {
                     alt: 'jsonc',
                     sort:order,
+                    sort_by: 'created',
+                    sort_direction: '0',
                     limit: this.pageSize,
                     start: (this.wistia_page -1) * this.pageSize
 //                    q: 'filter'

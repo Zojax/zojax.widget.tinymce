@@ -4,4 +4,4 @@ $(document).ready(function(){
         if($(this).attr('name').indexOf('http://fast.wistia.net/embed/iframe')>-1)
             $(this).attr('src', $(this).attr('name'))
     })
-})
+});

@@ -62,67 +62,70 @@ Let's edit content, editor includes js to head and includes tiny_mce.js
     >>> user.open('http://localhost/page/context.html')
     >>> print user.contents
     <html>
-    ...
+      <head>
     <script type="text/javascript" src="http://localhost/.../tiny-mce/tiny_mce.js"></script>
-    <BLANKLINE>
     <script type="text/javascript" src="http://localhost/.../jquery.js"></script>
-    <BLANKLINE>
     <script type="text/javascript" src="http://localhost/.../jquery-plugins.js"></script>
     <link rel="stylesheet" type="text/css" href="http://localhost/.../jquery-plugins.css" />
-    <BLANKLINE>
     <script type="text/javascript" src="http://localhost/.../jq-ajax-form.js"></script>
     <base href="http://localhost/page/context.html/" />
     ...
     <script type="text/javascript">
-        tinyMCE.init({
-            mode : "exact", button_tile_map : true,
-            contentUrl : "http://localhost/@@content.browser/.../contentManagerAPI/",
-            content_css : "http://localhost/@@/zojax.css",
-            convert_urls : false,
-            extended_valid_elements : "script[charset|defer|language|src|type]|img[style|class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
-            external_image_list_url : "http://localhost/page/@@tinymce_image_list.js?" + new Date().getTime(),
-            external_link_list_url : "http://localhost/page/@@tinymce_link_list.js?" + new Date().getTime(),
-            imageMaxHeight : "360",
-            imageMaxWidth : "480",
-            language : "en",
-            mediaUrl1 : "http://localhost/@@content.attachments/.../mediaManagerAPI/",
-            mediaUrl2 : "http://localhost/@@content.attachments/.../mediaManagerAPI/",
-            media_external_list_url : "http://localhost/page/@@tinymce_file_list.js?" + new Date().getTime(),
-            mode : "exact",
-            paste_auto_cleanup_on_paste : true,
-            paste_convert_headers_to_strong : true,
-            plugin_insertdate_dateFormat : "%d/%m/%Y",
-            plugin_insertdate_timeFormat : "%H:%M:%S",
-            plugins : "safari,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
-            theme : "advanced",
-            theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
-            theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
-            theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
-            theme_advanced_buttons4 : "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak",
-            theme_advanced_path_location : "bottom",
-            theme_advanced_resizing : true,
-            theme_advanced_statusbar_location : "bottom",
-            theme_advanced_toolbar_align : "left",
-            theme_advanced_toolbar_location : "top",
-            url1 : "http://localhost/@@content.attachments/.../imageManagerAPI/",
-            url2 : "http://localhost/@@content.attachments/.../imageManagerAPI/",
-            wistiaApiPassword : "50fe24d3645fd924b3b2ce55aa061273104ecb40",
-            wistiaApiProxyUrl : "/WistiaTinyMCEJsAPI/",
-            wistiaApiUsername : "api", language : "en",
-            mce_extended_valid_elements : "script[charset|defer|language|src|type]|img[style|class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
-            elements : "form-widgets-text" }); </script>
+    tinyMCE.init({
+    mode : "exact", button_tile_map : true,
+    contentUrl : "http://localhost/@@content.browser/.../contentManagerAPI/",
+    content_css : "http://localhost/@@/zojax.css",
+    convert_urls : false,
+    extended_valid_elements : "script[charset|defer|language|src|type]|img[style|class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
+    external_image_list_url : "http://localhost/page/@@tinymce_image_list.js?" + new Date().getTime(),
+    external_link_list_url : "http://localhost/page/@@tinymce_link_list.js?" + new Date().getTime(),
+    imageMaxHeight : "360",
+    imageMaxWidth : "480",
+    language : "en",
+    mediaUrl1 : "http://localhost/@@content.attachments/.../mediaManagerAPI/",
+    mediaUrl2 : "http://localhost/@@content.attachments/.../mediaManagerAPI/",
+    media_external_list_url : "http://localhost/page/@@tinymce_file_list.js?" + new Date().getTime(),
+    mode : "exact",
+    paste_auto_cleanup_on_paste : true,
+    paste_convert_headers_to_strong : true,
+    plugin_insertdate_dateFormat : "%d/%m/%Y",
+    plugin_insertdate_timeFormat : "%H:%M:%S",
+    plugins : "safari,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
+    theme : "advanced",
+    theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
+    theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
+    theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
+    theme_advanced_buttons4 : "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak",
+    theme_advanced_path_location : "bottom",
+    theme_advanced_resizing : true,
+    theme_advanced_statusbar_location : "bottom",
+    theme_advanced_toolbar_align : "left",
+    theme_advanced_toolbar_location : "top",
+    url1 : "http://localhost/@@content.attachments/.../imageManagerAPI/",
+    url2 : "http://localhost/@@content.attachments/.../imageManagerAPI/",
+    wistiaApiPassword : "...",
+    wistiaApiProxyUrl : "/WistiaTinyMCEJsAPI/",
+    wistiaApiUsername : "api", language : "en", mce_extended_valid_elements : "iframe[src|style|class|src2|width|height|allowtransparency|frameborder|name]|script[charset|defer|language|src|type]|img[style|class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
+    elements : "form-widgets-text" }); </script>
+    <script>
+    function check_url(url) {
+            var x = new XMLHttpRequest();
+            x.onreadystatechange = function() {
+                if (x.readyState == x.DONE) {
+                    var ct = this.getResponseHeader('content-type');
+                    if (ct != null && ct.indexOf('image') !== -1) {
+                        return true
+                    } else {
+                        return false;
+                    }
+                }
+            };
+            x.open('GET', url, false);
+            x.send();
+    }
+    </script>
     ...
-
-  <div class="z-form-help">Page body text.</div>
-  <div><textarea id="form-widgets-text" name="form.widgets.text"
-          class="tinymce-text-widget required richtext-field"
-          cols="80" rows="30"></textarea>
-  <script type="text/javascript">
-        tinyMCE.init({
-  ...
-        }); </script>
-  ...
-  </div>
+    </html>
 
     >>> user.getControl('Body').value = u'<div>Test page</div>'
     >>> user.getControl(name="content.edit.buttons.save").click()
@@ -154,4 +157,4 @@ Let's check APIs for plugin
     >>> user.open('/WistiaTinyMCEJsAPI/?alt=jsonc&limit=30&start=0')
     >>> simplejson.loads(user.contents)
     [...]
-    >>> ids = getUtility(IIntIds)
+    >>> ids = component.getUtility(IIntIds)

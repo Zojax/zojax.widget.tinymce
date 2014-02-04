@@ -25,6 +25,7 @@
 
   <class class="zojax.widget.tinymce.tests.content.Page">
     <implements interface="zojax.content.attachment.interfaces.IAttachmentsAware" />
+    <implements interface="zojax.ownership.interfaces.IOwnership" />
     <require
        permission="zojax.ModifyContent"
        set_schema="zojax.widget.tinymce.tests.content.IPage"

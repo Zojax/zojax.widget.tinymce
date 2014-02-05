@@ -80,8 +80,7 @@ Let's edit content, editor includes js to head and includes tiny_mce.js
     imageMaxHeight : "360",
     imageMaxWidth : "480",
     language : "en",
-    mediaUrl1 : "http://localhost/@@content.attachments/.../mediaManagerAPI/",
-    mediaUrl2 : "http://localhost/@@content.attachments/.../mediaManagerAPI/",
+    ...
     media_external_list_url : "http://localhost/page/@@tinymce_file_list.js?" + new Date().getTime(),
     mode : "exact",
     paste_auto_cleanup_on_paste : true,
@@ -99,8 +98,7 @@ Let's edit content, editor includes js to head and includes tiny_mce.js
     theme_advanced_statusbar_location : "bottom",
     theme_advanced_toolbar_align : "left",
     theme_advanced_toolbar_location : "top",
-    url1 : "http://localhost/@@content.attachments/.../imageManagerAPI/",
-    url2 : "http://localhost/@@content.attachments/.../imageManagerAPI/",
+    ...
     wistiaApiPassword : "...",
     wistiaApiProxyUrl : "/WistiaTinyMCEJsAPI/",
     wistiaApiUsername : "api", language : "en", mce_extended_valid_elements : "iframe[src|style|class|src2|width|height|allowtransparency|frameborder|name]|script[charset|defer|language|src|type]|img[style|class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",

@@ -22,9 +22,9 @@ from zojax.filefield.testing import ZCMLLayer, FunctionalDocFileSuite
 from zojax.layoutform.interfaces import ILayoutFormLayer
 
 
-zojaxExtJSEditorLayer = ZCMLLayer(
+zojaxWidgetTinyMCELayer = ZCMLLayer(
     os.path.join(os.path.split(__file__)[0], 'ftesting.zcml'),
-    __name__, 'zojaxExtJSEditorLayer', allow_teardown=True)
+    __name__, 'zojaxWidgetTinyMCELayer', allow_teardown=True)
 
 
 def getPath(filename):
@@ -39,6 +39,6 @@ def test_suite():
     testbrowser = FunctionalDocFileSuite(
         "testbrowser.txt",
         optionflags=doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
-    testbrowser.layer = zojaxExtJSEditorLayer
+    testbrowser.layer = zojaxWidgetTinyMCELayer
 
     return unittest.TestSuite((testbrowser, ))

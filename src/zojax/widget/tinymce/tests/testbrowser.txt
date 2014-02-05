@@ -157,4 +157,3 @@ Let's check APIs for plugin
     >>> user.open('/WistiaTinyMCEJsAPI/?alt=jsonc&limit=30&start=0')
     >>> simplejson.loads(user.contents)
     [...]
-    >>> ids = component.getUtility(IIntIds)

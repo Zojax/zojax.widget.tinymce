@@ -27,8 +27,6 @@ ExtJS Editor widget
     >>> root['people'] = manager
     >>> root.getSiteManager().registerUtility(root['people'], IPersonalSpaceManager)
 
-    >>> manager.assignPersonalSpace(
-    ...     component.getUtility(IAuthentication).getPrincipal('zope.user'))
 
     >>> page = Page()
     >>> event.notify(ObjectCreatedEvent(page))

@@ -66,15 +66,17 @@ Let's edit content, editor includes js to head and includes tiny_mce.js
     <script type="text/javascript" src="http://localhost/.../jquery-plugins.js"></script>
     <link rel="stylesheet" type="text/css" href="http://localhost/.../jquery-plugins.css" />
     <script type="text/javascript" src="http://localhost/.../jq-ajax-form.js"></script>
+    ...
     <base href="http://localhost/page/context.html/" />
     ...
     <script type="text/javascript">
     tinyMCE.init({
+    verify_html : true,
     mode : "exact", button_tile_map : true,
     contentUrl : "http://localhost/@@content.browser/.../contentManagerAPI/",
     content_css : "http://localhost/@@/zojax.css",
     convert_urls : false,
-    extended_valid_elements : "script[charset|defer|language|src|type]|img[style|class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
+    extended_valid_elements : "iframe[src|style|class|src2|width|height|allowtransparency|frameborder|name],script[charset|defer|language|src|type],img[style|class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
     external_image_list_url : "http://localhost/page/@@tinymce_image_list.js?" + new Date().getTime(),
     external_link_list_url : "http://localhost/page/@@tinymce_link_list.js?" + new Date().getTime(),
     imageMaxHeight : "360",
@@ -101,7 +103,7 @@ Let's edit content, editor includes js to head and includes tiny_mce.js
     ...
     wistiaApiPassword : "...",
     wistiaApiProxyUrl : "/WistiaTinyMCEJsAPI/",
-    wistiaApiUsername : "api", language : "en", mce_extended_valid_elements : "iframe[src|style|class|src2|width|height|allowtransparency|frameborder|name]|script[charset|defer|language|src|type]|img[style|class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
+    wistiaApiUsername : "api", language : "en",
     elements : "form-widgets-text" }); </script>
     <script>
     function check_url(url) {
